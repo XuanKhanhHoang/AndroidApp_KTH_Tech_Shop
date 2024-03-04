@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">KTH Tech Shop</string>
+    <string name="find_text">Tìm kiếm</string>
+    <string name="back_text">Back</string>
+    <string name="loading">Loading</string>
+    <string name="loading_threeDot">Loading...</string>
+    <string name="buy_now">Mua ngay</string>
+    <string name="add_to_cart">Thêm vào giỏ hàng</string>
+</resources>

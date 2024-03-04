@@ -1,0 +1,26 @@
+<resources>
+    
+    <!-- Base application theme. -->
+    <style name="Base.Theme.KTHTechShop" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Customize your light theme here. -->
+        <item name="colorPrimary">@color/white</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:windowBackground">@color/white</item>
+    </style>
+
+    <style name="Theme.KTHTechShop" parent="Base.Theme.KTHTechShop" />
+
+    <style name="MyShapeAppearance">
+        <item name="android:padding">0dp</item>
+    </style>
+
+    <style name="MyButtonStyle" parent="Widget.Material3.Button">
+        <item name="shapeAppearance">@style/MyShapeAppearance</item>
+    </style>
+
+    <style name="ThemeOverlay.AppTheme.TextInputEditText.Outlined" parent="">
+        <item name="colorControlActivated">@color/light_grey</item>
+        <item name="android:textColorHint">#000</item>
+    </style>
+
+</resources>

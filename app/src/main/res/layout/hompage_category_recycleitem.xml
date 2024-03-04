@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout android:layout_width="wrap_content"
+    android:layout_height="80dp"
+    android:orientation="vertical"
+    android:padding="4dp"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <ImageView
+        android:id="@+id/categoryLogo"
+        android:layout_width="60dp"
+        android:layout_height="34dp"
+        android:layout_gravity="center"
+        android:maxWidth="60dp"
+        android:scaleType="fitCenter"
+        app:srcCompat="@drawable/icon_user" />
+
+
+    <TextView
+        android:id="@+id/categoryName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:padding="5dp"
+        android:text="Máy tính bảng"
+        android:textAlignment="center"
+        android:textSize="10sp" />
+</LinearLayout>
+
