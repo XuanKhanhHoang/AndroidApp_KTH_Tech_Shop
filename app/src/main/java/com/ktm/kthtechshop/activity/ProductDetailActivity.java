@@ -1,5 +1,6 @@
 package com.ktm.kthtechshop.activity;
 
+import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.InputFilter;
@@ -53,43 +54,51 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
         refChildComponents();
         curAmount = 1;
         curPositionOption = 0;
-        productId = 1;
-        apiServices.getProductDetail(productId).enqueue(new Callback<ProductDetail>() {
-            @Override
-            public void onResponse(@NonNull Call<ProductDetail> call, @NonNull Response<ProductDetail> response) {
-                if (response.isSuccessful()) {
-                    product = response.body();
-                    ratingBar.setRating(product.rating);
-                    ratingBar.setStepSize(0.1f);
-                    ratingBar.setIsIndicator(true);
-                    totalCost = product.productOptions.get(0).sellingPrice;
-                    option_rclView.setAdapter(new Adapter_ProductDetail_ProductOptionRclView(ProductDetailActivity.this, product.productOptions, ProductDetailActivity.this));
-                    ArrayList<SlideModel> sr = new ArrayList<>();
-                    sr.add(new SlideModel(product.logo, ScaleTypes.CENTER_INSIDE));
-                    for (ProductDetail_ProductOption option : product.productOptions
-                    ) {
-                        if (option.image != null && option.image.length() != 0) {
-                            sr.add(new SlideModel(localhostIp.LOCALHOST_IP.getValue() + ":3000" + option.image, ScaleTypes.CENTER_INSIDE));
+        Intent it = getIntent();
+        if (it != null) {
+            productId = it.getIntExtra("productId", -1);
+        }
+        if (productId != -1)
+            apiServices.getProductDetail(productId).enqueue(new Callback<ProductDetail>() {
+                @Override
+                public void onResponse(@NonNull Call<ProductDetail> call, @NonNull Response<ProductDetail> response) {
+                    if (response.isSuccessful()) {
+                        product = response.body();
+                        ratingBar.setRating(product.rating);
+                        ratingBar.setStepSize(0.1f);
+                        ratingBar.setIsIndicator(true);
+                        totalCost = product.productOptions.get(0).sellingPrice;
+                        option_rclView.setAdapter(new Adapter_ProductDetail_ProductOptionRclView(ProductDetailActivity.this, product.productOptions, ProductDetailActivity.this));
+                        ArrayList<SlideModel> sr = new ArrayList<>();
+                        sr.add(new SlideModel(product.logo, ScaleTypes.CENTER_INSIDE));
+                        for (ProductDetail_ProductOption option : product.productOptions
+                        ) {
+                            if (option.image != null && option.image.length() != 0) {
+                                sr.add(new SlideModel(localhostIp.LOCALHOST_IP.getValue() + ":3000" + option.image, ScaleTypes.CENTER_INSIDE));
+                            }
                         }
-                    }
-                    slider.setImageList(sr);
-                    notifyCurrOptionChange();
+                        slider.setImageList(sr);
+                        notifyCurrOptionChange();
 
-                } else {
-                    Toast.makeText(ProductDetailActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ProductDetailActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
+                        findViewById(R.id.ProductDetail_MainContent).setVisibility(View.GONE);
+                        findViewById(R.id.ProductDetail_ErrorText).setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<ProductDetail> call, Throwable t) {
+                    Toast.makeText(ProductDetailActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
                     findViewById(R.id.ProductDetail_MainContent).setVisibility(View.GONE);
                     findViewById(R.id.ProductDetail_ErrorText).setVisibility(View.VISIBLE);
                 }
-            }
-
-            @Override
-            public void onFailure(Call<ProductDetail> call, Throwable t) {
-                Toast.makeText(ProductDetailActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
-                findViewById(R.id.ProductDetail_MainContent).setVisibility(View.GONE);
-                findViewById(R.id.ProductDetail_ErrorText).setVisibility(View.VISIBLE);
-            }
-        });
-
+            });
+        else {
+            Toast.makeText(ProductDetailActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
+            findViewById(R.id.ProductDetail_MainContent).setVisibility(View.GONE);
+            findViewById(R.id.ProductDetail_ErrorText).setVisibility(View.VISIBLE);
+        }
 
         limitTextInputEditText(amount_editTxtView);
         option_rclView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));

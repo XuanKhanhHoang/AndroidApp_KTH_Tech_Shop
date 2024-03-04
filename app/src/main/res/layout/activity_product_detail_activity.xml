@@ -4,15 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-
+    tools:context=".activity.ProductDetailActivity"
     android:fontFamily="sans-serif-condensed">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:id="@+id/ProductDetail_RootLayout"
-        tools:context=".activity.ProductDetailActivity">
+        android:id="@+id/ProductDetail_RootLayout">
 
         <LinearLayout
             android:id="@+id/linearLayout"

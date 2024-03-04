@@ -2,6 +2,7 @@ package com.ktm.kthtechshop.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ScrollView;
@@ -35,7 +36,8 @@ public class ProductListActivity extends NeededCallApiActivity {
     private Integer page, totalPage;
     private ScrollView scrollView;
     private TextView loadingTxtView;
-    Map<String, String> coreQueryParams;
+    private Map<String, String> coreQueryParams;
+    private boolean isWaiting = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,25 +51,29 @@ public class ProductListActivity extends NeededCallApiActivity {
         loadingTxtView = findViewById(R.id.loadingText);
         productListRclView.setLayoutManager(new GridLayoutManager(this, 2));
         productListRclView.setHasFixedSize(true);
+        productListRclView.setNestedScrollingEnabled(false);
         productList = new ArrayList<>();
         adapterProductPreviewRclView = new Adapter_ProductPreviewRclView(getApplicationContext(), productList);
         productListRclView.setAdapter(adapterProductPreviewRclView);
         Intent intent = getIntent();
         coreQueryParams = new HashMap<>();
-        coreQueryParams = (HashMap<String, String>) intent.getSerializableExtra("queryParams");
-        if (coreQueryParams == null) {
-        }
+        if (intent != null && intent.getSerializableExtra("queryParams") != null)
+            coreQueryParams = (HashMap<String, String>) intent.getSerializableExtra("queryParams");
+
         GetDataFromApi(page, true);
 
         scrollView.setOnScrollChangeListener(new ScrollView.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
                 ViewGroup viewGroup = (ViewGroup) v;
-                if (scrollY == viewGroup.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight()) {
-                    // in this method we are incrementing page number,
-                    // making progress bar visible and calling get data method.
+                if (!isWaiting && scrollY == viewGroup.getChildAt(0).getMeasuredHeight() - v.getMeasuredHeight()) {
                     if (page < totalPage + 2) page++;
                     loadingTxtView.setVisibility(View.VISIBLE);
+                    isWaiting = true;
+                    new Handler().postDelayed(() -> {
+                        isWaiting = false;
+                        loadingTxtView.setVisibility(View.GONE);
+                    }, 1300);
                     GetDataFromApi(page, false);
                 }
             }
@@ -78,7 +84,7 @@ public class ProductListActivity extends NeededCallApiActivity {
     private void GetDataFromApi(Integer page, boolean isFirstGet) {
         if (!isFirstGet && page > totalPage) {
             Toast.makeText(this, "That's all the data..", Toast.LENGTH_SHORT).show();
-            loadingTxtView.setVisibility(View.GONE);
+            if (!isWaiting) loadingTxtView.setVisibility(View.GONE);
             return;
         }
 
@@ -92,7 +98,7 @@ public class ProductListActivity extends NeededCallApiActivity {
                     if (pr != null && page == 1 && pr.totalPage == 0)
                         findViewById(R.id.no_product_textView).setVisibility(View.VISIBLE);
                     if (pr != null) productList.addAll(pr.data);
-                    findViewById(R.id.loadingText).setVisibility(View.GONE);
+                    if (!isWaiting) findViewById(R.id.loadingText).setVisibility(View.GONE);
                     adapterProductPreviewRclView.notifyDataSetChanged();
                 } else {
                     Toast.makeText(ProductListActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();

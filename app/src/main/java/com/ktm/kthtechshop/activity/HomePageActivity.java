@@ -264,14 +264,14 @@ public class HomePageActivity extends NeededCallApiActivity {
     private void checkValidUserSession() {
         String accessToken = appSharedPreferences.getAccessToken();
         if (!accessToken.isEmpty() || appSharedPreferences.getIsAuth()) {
-            apiServices.loginWithAccessToken(accessToken).enqueue(new Callback<LoginResponse>() {
+            apiServices.loginWithAccessToken("Bearer " + accessToken).enqueue(new Callback<LoginResponse>() {
                 @Override
                 public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
                     if (response.isSuccessful()) {
                         appSharedPreferences.setAllAttribute(response.body().value.userId,
                                 response.body().accessToken, response.body().value.firstName,
                                 response.body().value.avatar);
-                        new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + response.body().value.avatar, userImgView);
+                        new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + response.body().value.avatar, userImgView).execute();
                         isCheckingAccount = false;
                     } else {
                         Toast.makeText(HomePageActivity.this, "Xác thực thất bại, vui lòng đăng nhập lại ", Toast.LENGTH_SHORT).show();

@@ -13,6 +13,7 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
@@ -33,7 +34,7 @@ public interface ApiServices {
     @POST("auth/login")
     Call<LoginResponse> loginWithPassword(@Body Login_UserInfo userInfo);
 
-    @POST("auth/login")
-    Call<LoginResponse> loginWithAccessToken(@Body String accessToken);
+    @POST("auth/refreshinfobyaccesstoken")
+    Call<LoginResponse> loginWithAccessToken(@Header("Authorization") String accessToken);
 }
 

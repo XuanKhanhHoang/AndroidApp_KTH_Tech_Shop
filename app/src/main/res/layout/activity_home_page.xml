@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:nestedScrollingEnabled="false"
 
     >
 
@@ -11,6 +12,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
+        android:nestedScrollingEnabled="false"
         tools:context=".activity.MainActivity">
 
 
@@ -46,12 +48,12 @@
                     android:padding="0dp"
 
                     android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
+                    app:boxBackgroundColor="@color/white"
                     app:boxStrokeColor="@color/main"
                     app:boxStrokeWidth="1dp"
-                    app:cursorColor="#000"
 
-                    app:placeholderText="@string/find_text"
-                    app:boxBackgroundColor="@color/white">
+                    app:cursorColor="#000"
+                    app:placeholderText="@string/find_text">
 
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
@@ -120,6 +122,7 @@
             android:layout_marginEnd="20dp"
             android:background="#FFFFFF"
             android:fadeScrollbars="false"
+            android:nestedScrollingEnabled="false"
             android:scrollbarAlwaysDrawHorizontalTrack="true"
             android:scrollbarSize="3dp"
             android:scrollbarThumbHorizontal="@drawable/scrollbar"
@@ -136,6 +139,8 @@
             android:layout_height="128dp"
             android:layout_marginTop="10dp"
             android:padding="14dp"
+            android:nestedScrollingEnabled="false"
+
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
@@ -240,11 +245,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
                 android:backgroundTint="#ffff"
+                android:drawableEnd="@drawable/ic_chevron_right_solid"
+                android:shadowColor="@color/white"
                 android:text="Xem thêm"
                 android:textColor="#000000"
                 android:textSize="14sp"
-                android:drawableEnd="@drawable/ic_chevron_right_solid"
-                android:shadowColor="@color/white"
                 app:cornerRadius="3dp" />
 
         </LinearLayout>
@@ -255,6 +260,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
+            android:nestedScrollingEnabled="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/linearLayout2">
@@ -313,19 +319,20 @@
             android:id="@+id/smartphoneListNoProduct_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingVertical="5dp"
             android:text="Hiện tại không có sản phẩm nào"
             android:textAlignment="center"
+            android:visibility="visible"
             app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/smartphoneHeader"
-            android:paddingVertical="5dp"
-            android:visibility="visible" />
+            app:layout_constraintTop_toBottomOf="@id/smartphoneHeader" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/smartphone_rclview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
+            android:nestedScrollingEnabled="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/smartphoneHeader" />
@@ -381,19 +388,20 @@
             android:id="@+id/laptop_no_product_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingVertical="5dp"
             android:text="Hiện tại không có sản phẩm nào"
             android:textAlignment="center"
+            android:visibility="visible"
             app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/LaptopHeader"
-            android:paddingVertical="5dp"
-            android:visibility="visible" />
+            app:layout_constraintTop_toBottomOf="@id/LaptopHeader" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/laptop_rclview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
+            android:nestedScrollingEnabled="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/LaptopHeader" />
@@ -450,19 +458,20 @@
             android:id="@+id/allProductNoProduct_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingVertical="5dp"
             android:text="Hiện tại không có sản phẩm nào"
             android:textAlignment="center"
+            android:visibility="visible"
             app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/allProductListHeader"
-            android:paddingVertical="5dp"
-            android:visibility="visible" />
+            app:layout_constraintTop_toBottomOf="@id/allProductListHeader" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/allProductlist_rclview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
+            android:nestedScrollingEnabled="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/allProductListHeader" />
