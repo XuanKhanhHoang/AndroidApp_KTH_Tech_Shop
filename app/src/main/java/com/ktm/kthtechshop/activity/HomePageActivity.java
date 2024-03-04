@@ -3,6 +3,7 @@ package com.ktm.kthtechshop.activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -32,6 +33,7 @@ import com.ktm.kthtechshop.dto.ProductPreviewItem;
 import com.ktm.kthtechshop.dto.PromotionBannerItem;
 import com.ktm.kthtechshop.localhostIp;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,7 +52,36 @@ public class HomePageActivity extends NeededCallApiActivity {
     private ImageSlider promotionBannerSlider;
     private AppSharedPreferences appSharedPreferences;
     private ImageView userImgView;
+    private Button smartPhoneBtnMore, laptopBtnMore, latestProductBtnMore;
     private boolean isCheckingAccount = true;
+    public final Integer smartphoneCategoryId = 1, laptopCategoryId = 2;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        appSharedPreferences = new AppSharedPreferences(this);
+        setContentView(R.layout.activity_home_page);
+        //Init api service
+        initApiService();
+        //Init Array Lists
+        initLists();
+        //ref child view component
+        refChildComponents();
+        //setup rclviews
+        setUpRclViews();
+        //Call api
+        checkValidUserSession();
+        getPromotionBanner();
+        getCategory();
+        getFlashSaleProduct();
+        getLatestProduct();
+        getSmartPhoneProduct();
+        getLaptopProduct();
+        //setup button click listener
+        setUpButtonsOnClickListen();
+
+
+    }
 
     protected void refChildComponents() {
         promotionBannerSlider = findViewById(R.id.promotionBannerSlider);
@@ -61,6 +92,9 @@ public class HomePageActivity extends NeededCallApiActivity {
         laptopProductRclView = findViewById(R.id.laptop_rclview);
         flashSaleRclView = findViewById(R.id.flashsale_rclview);
         userImgView = findViewById(R.id.Hompage_UserIcon_imgView);
+        smartPhoneBtnMore = findViewById(R.id.HomPage_Btn_smartphoneHeader_more);
+        laptopBtnMore = findViewById(R.id.HomPage_Btn_LaptopHeader_more);
+        latestProductBtnMore = findViewById(R.id.HomPage_Btn_newProductHeader_more);
     }
 
     protected void initLists() {
@@ -85,49 +119,7 @@ public class HomePageActivity extends NeededCallApiActivity {
         laptopProductRclView.setHasFixedSize(true);
     }
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        appSharedPreferences = new AppSharedPreferences(this);
-        setContentView(R.layout.activity_home_page);
-        //Init api service
-        initApiService();
-        //Init Array Lists
-        initLists();
-        //ref child view component
-        refChildComponents();
-        //setup rclviews
-        setUpRclViews();
-        //Call api
-        String accessToken = appSharedPreferences.getAccessToken();
-        if (!accessToken.isEmpty() || appSharedPreferences.getIsAuth()) {
-            apiServices.loginWithAccessToken(accessToken).enqueue(new Callback<LoginResponse>() {
-                @Override
-                public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                    if (response.isSuccessful()) {
-                        appSharedPreferences.setAllAttribute(response.body().value.userId,
-                                response.body().accessToken, response.body().value.firstName,
-                                response.body().value.avatar);
-                        new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + response.body().value.avatar, userImgView);
-                        isCheckingAccount = false;
-                    } else {
-                        Toast.makeText(HomePageActivity.this, "Xác thực thất bại, vui lòng đăng nhập lại ", Toast.LENGTH_SHORT).show();
-                        appSharedPreferences.clear();
-                        userImgView.setImageResource(R.drawable.icon_user);
-                        isCheckingAccount = false;
-
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<LoginResponse> call, Throwable t) {
-                    Toast.makeText(HomePageActivity.this, "Xác thực thất bại, vui lòng đăng nhập lại ", Toast.LENGTH_SHORT).show();
-                    appSharedPreferences.clear();
-                    userImgView.setImageResource(R.drawable.icon_user);
-                    isCheckingAccount = false;
-                }
-            });
-        }
+    private void getPromotionBanner() {
         apiServices.getListPromotionBanner().enqueue(new Callback<ArrayList<PromotionBannerItem>>() {
             @Override
             public void onResponse(Call<ArrayList<PromotionBannerItem>> call, Response<ArrayList<PromotionBannerItem>> response) {
@@ -159,6 +151,9 @@ public class HomePageActivity extends NeededCallApiActivity {
                 Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void getCategory() {
         apiServices.getCategoryList().enqueue(new Callback<ArrayList<CategoryItem>>() {
             @Override
             public void onResponse(Call<ArrayList<CategoryItem>> call, Response<ArrayList<CategoryItem>> response) {
@@ -181,6 +176,20 @@ public class HomePageActivity extends NeededCallApiActivity {
                 Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void getFlashSaleProduct() {
+        float rating = 3.4f;
+        Integer productId = 1;
+        flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 ", 20000000, 20000000, productId, rating));
+        flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 ", 20000000, 20000000, productId, rating));
+        flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 abc  ", 3000000, 200000, 20, productId, rating));
+        flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 abc", 3000000, 200000, 20, productId, rating));
+        flashSaleRclView.setAdapter(new Adapter_FlashSalePreviewRclView(getApplicationContext(), flashSaleProductList));
+
+    }
+
+    private void getLatestProduct() {
         Map<String, String> mp = new HashMap<String, String>();
         mp.put("product_per_page", "6");
         apiServices.getProductList(mp).enqueue(new Callback<ProductListResponse>() {
@@ -202,6 +211,9 @@ public class HomePageActivity extends NeededCallApiActivity {
                 Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void getSmartPhoneProduct() {
         Map<String, String> mp1 = new HashMap<String, String>();
         mp1.put("category_id", "1");
         apiServices.getProductList(mp1).enqueue(new Callback<ProductListResponse>() {
@@ -223,6 +235,9 @@ public class HomePageActivity extends NeededCallApiActivity {
                 Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void getLaptopProduct() {
         Map<String, String> mp2 = new HashMap<String, String>();
         mp2.put("category_id", "2");
         apiServices.getProductList(mp2).enqueue(new Callback<ProductListResponse>() {
@@ -244,30 +259,105 @@ public class HomePageActivity extends NeededCallApiActivity {
                 Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
             }
         });
-        userImgView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+    }
 
-                if (!isCheckingAccount) {
-                    if (!appSharedPreferences.getIsAuth() || appSharedPreferences.getAccessToken().isEmpty()) {
-                        Intent it = new Intent(v.getContext(), LoginActivity.class);
-                        it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                        v.getContext().startActivity(it);
+    private void checkValidUserSession() {
+        String accessToken = appSharedPreferences.getAccessToken();
+        if (!accessToken.isEmpty() || appSharedPreferences.getIsAuth()) {
+            apiServices.loginWithAccessToken(accessToken).enqueue(new Callback<LoginResponse>() {
+                @Override
+                public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                    if (response.isSuccessful()) {
+                        appSharedPreferences.setAllAttribute(response.body().value.userId,
+                                response.body().accessToken, response.body().value.firstName,
+                                response.body().value.avatar);
+                        new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + response.body().value.avatar, userImgView);
+                        isCheckingAccount = false;
                     } else {
-                        //to user activity
+                        Toast.makeText(HomePageActivity.this, "Xác thực thất bại, vui lòng đăng nhập lại ", Toast.LENGTH_SHORT).show();
+                        appSharedPreferences.clear();
+                        userImgView.setImageResource(R.drawable.icon_user);
+                        isCheckingAccount = false;
+
                     }
+                }
+
+                @Override
+                public void onFailure(Call<LoginResponse> call, Throwable t) {
+                    Toast.makeText(HomePageActivity.this, "Xác thực thất bại, vui lòng đăng nhập lại ", Toast.LENGTH_SHORT).show();
+                    appSharedPreferences.clear();
+                    userImgView.setImageResource(R.drawable.icon_user);
+                    isCheckingAccount = false;
+                }
+            });
+        }
+
+    }
+
+    private void setUpButtonsOnClickListen() {
+        userImgView.setOnClickListener(v -> {
+            if (!isCheckingAccount) {
+                if (!appSharedPreferences.getIsAuth() || appSharedPreferences.getAccessToken().isEmpty()) {
+                    Intent it = new Intent(v.getContext(), LoginActivity.class);
+                    it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    v.getContext().startActivity(it);
+                } else {
+                    //to user activity
                 }
             }
         });
-
-        float rating = 3.4f;
-        Integer productId = 1;
-        flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 ", 20000000, 20000000, productId, rating));
-        flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 ", 20000000, 20000000, productId, rating));
-        flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 abc  ", 3000000, 200000, 20, productId, rating));
-        flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 abc", 3000000, 200000, 20, productId, rating));
-        flashSaleRclView.setAdapter(new Adapter_FlashSalePreviewRclView(getApplicationContext(), flashSaleProductList));
-
-
+        latestProductBtnMore.setOnClickListener((v) -> {
+            Intent it = new Intent(v.getContext(), ProductListActivity.class);
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            v.getContext().startActivity(it);
+        });
+        smartPhoneBtnMore.setOnClickListener((v) -> {
+            Intent it = new Intent(v.getContext(), ProductListActivity.class);
+            Map<String, String> mp = new HashMap<String, String>();
+            mp.put("category_id", smartphoneCategoryId.toString());
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            it.putExtra("queryParams", (Serializable) mp);
+            v.getContext().startActivity(it);
+        });
+        laptopBtnMore.setOnClickListener((v) -> {
+            Intent it = new Intent(v.getContext(), ProductListActivity.class);
+            Map<String, String> mp = new HashMap<String, String>();
+            mp.put("category_id", laptopCategoryId.toString());
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            it.putExtra("queryParams", (Serializable) mp);
+            v.getContext().startActivity(it);
+        });
+        userImgView.setOnClickListener(v -> {
+            if (!isCheckingAccount) {
+                if (!appSharedPreferences.getIsAuth() || appSharedPreferences.getAccessToken().isEmpty()) {
+                    Intent it = new Intent(v.getContext(), LoginActivity.class);
+                    it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    v.getContext().startActivity(it);
+                } else {
+                    //to user activity
+                }
+            }
+        });
+        latestProductBtnMore.setOnClickListener((v) -> {
+            Intent it = new Intent(v.getContext(), ProductListActivity.class);
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            v.getContext().startActivity(it);
+        });
+        smartPhoneBtnMore.setOnClickListener((v) -> {
+            Intent it = new Intent(v.getContext(), ProductListActivity.class);
+            Map<String, String> mp = new HashMap<String, String>();
+            mp.put("category_id", smartphoneCategoryId.toString());
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            it.putExtra("queryParams", (Serializable) mp);
+            v.getContext().startActivity(it);
+        });
+        laptopBtnMore.setOnClickListener((v) -> {
+            Intent it = new Intent(v.getContext(), ProductListActivity.class);
+            Map<String, String> mp = new HashMap<String, String>();
+            mp.put("category_id", laptopCategoryId.toString());
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            it.putExtra("queryParams", (Serializable) mp);
+            v.getContext().startActivity(it);
+        });
     }
 }

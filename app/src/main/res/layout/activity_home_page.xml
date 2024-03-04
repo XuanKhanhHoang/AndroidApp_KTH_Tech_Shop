@@ -291,7 +291,7 @@
                 app:drawableStartCompat="@drawable/category_title_drawable" />
 
             <Button
-                android:id="@+id/btn_smartphoneHeader_more"
+                android:id="@+id/HomPage_Btn_smartphoneHeader_more"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="113dp"
                 android:layout_height="match_parent"
@@ -359,7 +359,7 @@
                 app:drawableStartCompat="@drawable/category_title_drawable" />
 
             <Button
-                android:id="@+id/btn_LaptopHeader_more"
+                android:id="@+id/HomPage_Btn_LaptopHeader_more"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="113dp"
                 android:layout_height="match_parent"
@@ -428,7 +428,7 @@
                 app:drawableStartCompat="@drawable/category_title_drawable" />
 
             <Button
-                android:id="@+id/btn_newProductHeader_more"
+                android:id="@+id/HomPage_Btn_newProductHeader_more"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="113dp"
                 android:layout_height="match_parent"
