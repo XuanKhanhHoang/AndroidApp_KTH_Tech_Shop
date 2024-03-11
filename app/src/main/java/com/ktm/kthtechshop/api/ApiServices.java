@@ -1,6 +1,7 @@
 package com.ktm.kthtechshop.api;
 
 import com.ktm.kthtechshop.dto.CategoryItem;
+import com.ktm.kthtechshop.dto.GetCartResponse;
 import com.ktm.kthtechshop.dto.LoginResponse;
 import com.ktm.kthtechshop.dto.Login_UserInfo;
 import com.ktm.kthtechshop.dto.ProductDetail;
@@ -36,5 +37,8 @@ public interface ApiServices {
 
     @POST("auth/refreshinfobyaccesstoken")
     Call<LoginResponse> loginWithAccessToken(@Header("Authorization") String accessToken);
+
+    @GET("cart/getcart")
+    Call<GetCartResponse> getCart(@Header("Authorization") String accessToken);
 }
 

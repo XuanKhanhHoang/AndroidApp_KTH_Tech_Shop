@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -19,8 +20,6 @@ import com.google.android.flexbox.FlexWrap;
 import com.google.android.flexbox.FlexboxLayoutManager;
 import com.google.android.flexbox.JustifyContent;
 import com.ktm.kthtechshop.AppSharedPreferences;
-import com.ktm.kthtechshop.ImageLoadFromURL;
-import com.ktm.kthtechshop.PromotionBannerType;
 import com.ktm.kthtechshop.R;
 import com.ktm.kthtechshop.adapter.Adapter_CategoryRclView;
 import com.ktm.kthtechshop.adapter.Adapter_FlashSalePreviewRclView;
@@ -32,6 +31,8 @@ import com.ktm.kthtechshop.dto.ProductListResponse;
 import com.ktm.kthtechshop.dto.ProductPreviewItem;
 import com.ktm.kthtechshop.dto.PromotionBannerItem;
 import com.ktm.kthtechshop.localhostIp;
+import com.ktm.kthtechshop.staticData.PromotionBannerType;
+import com.ktm.kthtechshop.utils.ImageLoadFromURL;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -42,7 +43,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class HomePageActivity extends NeededCallApiActivity {
+public class HomePageActivity extends HaveProductSearchApiActivity {
 
     private RecyclerView categoryRclView, promotionStaticBannerRclView, flashSaleRclView, allProductRclView, smartphoneProductRclView, laptopProductRclView;
     private ArrayList<SlideModel> promotionBannerSlideItems;
@@ -54,6 +55,7 @@ public class HomePageActivity extends NeededCallApiActivity {
     private ImageView userImgView;
     private Button smartPhoneBtnMore, laptopBtnMore, latestProductBtnMore;
     private boolean isCheckingAccount = true;
+    private ImageButton cartBtn;
     public final Integer smartphoneCategoryId = 1, laptopCategoryId = 2;
 
     @Override
@@ -72,6 +74,11 @@ public class HomePageActivity extends NeededCallApiActivity {
         //Call api
         checkValidUserSession();
         getPromotionBanner();
+        categoryItemArrayList.add(new CategoryItem("Loading...", "1", "1"));
+        categoryRclView.setAdapter(new Adapter_CategoryRclView(getApplicationContext(), categoryItemArrayList));
+        ArrayList tmp = new ArrayList<SlideModel>();
+        tmp.add(new SlideModel(R.drawable.img_loading_text, ScaleTypes.FIT));
+        promotionBannerSlider.setImageList(tmp);
         getCategory();
         getFlashSaleProduct();
         getLatestProduct();
@@ -79,7 +86,7 @@ public class HomePageActivity extends NeededCallApiActivity {
         getLaptopProduct();
         //setup button click listener
         setUpButtonsOnClickListen();
-
+        setUpSearchFunction();
 
     }
 
@@ -91,10 +98,11 @@ public class HomePageActivity extends NeededCallApiActivity {
         smartphoneProductRclView = findViewById(R.id.smartphone_rclview);
         laptopProductRclView = findViewById(R.id.laptop_rclview);
         flashSaleRclView = findViewById(R.id.flashsale_rclview);
-        userImgView = findViewById(R.id.Hompage_UserIcon_imgView);
+        userImgView = findViewById(R.id.HomePage_UserIcon_imgView);
         smartPhoneBtnMore = findViewById(R.id.HomPage_Btn_smartphoneHeader_more);
         laptopBtnMore = findViewById(R.id.HomPage_Btn_LaptopHeader_more);
         latestProductBtnMore = findViewById(R.id.HomPage_Btn_newProductHeader_more);
+
     }
 
     protected void initLists() {
@@ -107,6 +115,12 @@ public class HomePageActivity extends NeededCallApiActivity {
     }
 
     protected void setUpRclViews() {
+        FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(getApplicationContext());
+        flexboxLayoutManager.setFlexDirection(FlexDirection.ROW);
+        flexboxLayoutManager.setFlexWrap(FlexWrap.WRAP);
+        flexboxLayoutManager.setJustifyContent(JustifyContent.CENTER);
+        categoryRclView.setLayoutManager(flexboxLayoutManager);
+        categoryRclView.setHasFixedSize(true);
         promotionStaticBannerRclView.setLayoutManager(new LinearLayoutManager(getApplicationContext(), RecyclerView.HORIZONTAL, false));
         allProductRclView.setLayoutManager(new GridLayoutManager(this, 2));
         promotionStaticBannerRclView.setHasFixedSize(true);
@@ -138,6 +152,7 @@ public class HomePageActivity extends NeededCallApiActivity {
                         }
 
                     }
+                    promotionStaticBannerRclView.setVisibility(View.VISIBLE);
                     promotionBannerSlider.setImageList(promotionBannerSlideItems);
                     promotionStaticBannerRclView.setAdapter(new Adapter_PromotionBannerStaticRclView(getApplicationContext(), promotionStaticBannerList));
 
@@ -159,13 +174,7 @@ public class HomePageActivity extends NeededCallApiActivity {
             public void onResponse(Call<ArrayList<CategoryItem>> call, Response<ArrayList<CategoryItem>> response) {
                 if (response.isSuccessful()) {
                     categoryItemArrayList = response.body();
-                    FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(getApplicationContext());
-                    flexboxLayoutManager.setFlexDirection(FlexDirection.ROW);
-                    flexboxLayoutManager.setFlexWrap(FlexWrap.WRAP);
-                    flexboxLayoutManager.setJustifyContent(JustifyContent.CENTER);
-                    categoryRclView.setLayoutManager(flexboxLayoutManager);
                     categoryRclView.setAdapter(new Adapter_CategoryRclView(getApplicationContext(), categoryItemArrayList));
-                    categoryRclView.setHasFixedSize(true);
                 } else {
                     Toast.makeText(HomePageActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
                 }
@@ -272,14 +281,13 @@ public class HomePageActivity extends NeededCallApiActivity {
                                 response.body().accessToken, response.body().value.firstName,
                                 response.body().value.avatar);
                         new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + response.body().value.avatar, userImgView).execute();
-                        isCheckingAccount = false;
                     } else {
                         Toast.makeText(HomePageActivity.this, "Xác thực thất bại, vui lòng đăng nhập lại ", Toast.LENGTH_SHORT).show();
                         appSharedPreferences.clear();
                         userImgView.setImageResource(R.drawable.icon_user);
-                        isCheckingAccount = false;
-
                     }
+                    isCheckingAccount = false;
+
                 }
 
                 @Override
@@ -291,7 +299,7 @@ public class HomePageActivity extends NeededCallApiActivity {
                 }
             });
         }
-
+        isCheckingAccount = false;
     }
 
     private void setUpButtonsOnClickListen() {
@@ -304,6 +312,15 @@ public class HomePageActivity extends NeededCallApiActivity {
                 } else {
                     //to user activity
                 }
+            }
+        });
+        ImageButton cartBtn = findViewById(R.id.HomePage_CartBtn);
+        cartBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent it = new Intent(HomePageActivity.this, CartActivity.class);
+                it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                HomePageActivity.this.startActivity(it);
             }
         });
         latestProductBtnMore.setOnClickListener((v) -> {

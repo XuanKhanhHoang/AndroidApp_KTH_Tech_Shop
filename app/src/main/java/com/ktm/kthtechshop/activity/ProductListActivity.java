@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,7 +27,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProductListActivity extends NeededCallApiActivity {
+public class ProductListActivity extends HaveProductSearchApiActivity {
 
     private ArrayList<ProductPreviewItem> productList;
 
@@ -38,6 +39,7 @@ public class ProductListActivity extends NeededCallApiActivity {
     private TextView loadingTxtView;
     private Map<String, String> coreQueryParams;
     private boolean isWaiting = false;
+    private ImageButton backBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +51,7 @@ public class ProductListActivity extends NeededCallApiActivity {
         productListRclView = findViewById(R.id.productList_rclview);
         scrollView = findViewById(R.id.scrollView);
         loadingTxtView = findViewById(R.id.loadingText);
+        backBtn = findViewById(R.id.backBtn);
         productListRclView.setLayoutManager(new GridLayoutManager(this, 2));
         productListRclView.setHasFixedSize(true);
         productListRclView.setNestedScrollingEnabled(false);
@@ -59,9 +62,14 @@ public class ProductListActivity extends NeededCallApiActivity {
         coreQueryParams = new HashMap<>();
         if (intent != null && intent.getSerializableExtra("queryParams") != null)
             coreQueryParams = (HashMap<String, String>) intent.getSerializableExtra("queryParams");
-
+        setUpSearchFunction();
+        if (coreQueryParams.get("keyword") != null && !coreQueryParams.get("keyword").isEmpty() && searchEditText != null) {
+            searchEditText.setText(coreQueryParams.get("keyword"));
+        }
         GetDataFromApi(page, true);
-
+        backBtn.setOnClickListener(v -> {
+            finish();
+        });
         scrollView.setOnScrollChangeListener(new ScrollView.OnScrollChangeListener() {
             @Override
             public void onScrollChange(View v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {

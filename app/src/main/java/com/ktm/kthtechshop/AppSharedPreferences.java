@@ -11,6 +11,7 @@ public class AppSharedPreferences {
     private SharedPreferences sharedPreferences;
     public static String PREF_FILE_NAME = "user_info";
 
+
     public AppSharedPreferences(AppCompatActivity activity) {
         this.sharedPreferences = activity.getSharedPreferences(PREF_FILE_NAME, MODE_PRIVATE);
     }
@@ -35,13 +36,20 @@ public class AppSharedPreferences {
         return sharedPreferences.getBoolean("isAuth", false);
     }
 
+    public String getCart() {
+        return sharedPreferences.getString("cart", "[]");
+    }
+
+    public void setCart(String cart) {
+        sharedPreferences.edit().putString("cart", cart).apply();
+    }
+
     public void setAccessToken(String accessToken) {
         sharedPreferences.edit().putString("accessToken", accessToken).apply();
     }
 
     public void setAvatar(String avatar) {
         sharedPreferences.edit().putString("avatar", avatar).apply();
-
     }
 
     public void setUserId(Integer userId) {
@@ -69,6 +77,7 @@ public class AppSharedPreferences {
         editor.apply();
     }
 
+  
     public void clear() {
         sharedPreferences.edit().clear().apply();
         sharedPreferences.edit().putBoolean("isAuth", false).apply();

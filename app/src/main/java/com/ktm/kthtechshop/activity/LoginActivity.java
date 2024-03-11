@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputLayout;
@@ -21,6 +22,7 @@ public class LoginActivity extends NeededCallApiActivity {
     private Button loginBtn, toRegisterBtn, forgotPasswordBtn;
     private TextInputLayout userNameTxtInpLayout, passwordTxtInpLayout;
     private SharedPreferences sharedPreferences;
+    private ImageButton backBtn;
     private boolean isLoading = false;
 
     @Override
@@ -60,8 +62,6 @@ public class LoginActivity extends NeededCallApiActivity {
                             editor.putString("firstName", response.body().value.firstName);
                             editor.putBoolean("isAuth", false);
                             editor.apply();
-                            isLoading = false;
-                            loginBtn.setText("Đăng nhập");
                             Intent it = new Intent(v.getContext(), HomePageActivity.class);
                             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             v.getContext().startActivity(it);
@@ -103,12 +103,16 @@ public class LoginActivity extends NeededCallApiActivity {
                 passwordTxtInpLayout.setErrorEnabled(false);
             }
         });
+        backBtn.setOnClickListener(v -> {
+            finish();
+        });
     }
 
     private void refChildComponents() {
         loginBtn = findViewById(R.id.Login_Btn_Login);
         toRegisterBtn = findViewById(R.id.Login_Btn_ToRegister);
 //        forgotPasswordBtn = findViewById(R.id.)
+        backBtn = findViewById(R.id.backBtn);
         userNameTxtInpLayout = findViewById(R.id.Login_UserName);
         passwordTxtInpLayout = findViewById(R.id.Login_Password);
     }

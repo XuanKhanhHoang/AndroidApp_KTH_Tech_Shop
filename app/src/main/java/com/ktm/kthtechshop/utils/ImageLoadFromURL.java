@@ -1,4 +1,4 @@
-package com.ktm.kthtechshop;
+package com.ktm.kthtechshop.utils;
 
 
 import android.graphics.Bitmap;

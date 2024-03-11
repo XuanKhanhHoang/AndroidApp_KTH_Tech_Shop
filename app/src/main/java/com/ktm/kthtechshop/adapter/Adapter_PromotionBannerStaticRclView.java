@@ -9,9 +9,9 @@ import android.widget.ImageView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ktm.kthtechshop.ImageLoadFromURL;
 import com.ktm.kthtechshop.R;
 import com.ktm.kthtechshop.dto.PromotionBannerItem;
+import com.ktm.kthtechshop.utils.ImageLoadFromURL;
 
 import java.util.ArrayList;
 

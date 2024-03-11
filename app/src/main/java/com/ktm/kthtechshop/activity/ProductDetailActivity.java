@@ -7,6 +7,7 @@ import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,13 +20,13 @@ import com.denzcoskun.imageslider.ImageSlider;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
 import com.denzcoskun.imageslider.models.SlideModel;
 import com.google.android.material.textfield.TextInputEditText;
-import com.ktm.kthtechshop.ProductDetail_ProductOption_ClickListener;
 import com.ktm.kthtechshop.R;
-import com.ktm.kthtechshop.Utils;
 import com.ktm.kthtechshop.adapter.Adapter_ProductDetail_ProductOptionRclView;
 import com.ktm.kthtechshop.dto.ProductDetail;
-import com.ktm.kthtechshop.dto.ProductDetail_ProductOption;
+import com.ktm.kthtechshop.dto.ProductOption;
 import com.ktm.kthtechshop.localhostIp;
+import com.ktm.kthtechshop.others.ProductDetail_ProductOption_ClickListener;
+import com.ktm.kthtechshop.utils.Utils;
 
 import java.util.ArrayList;
 
@@ -45,6 +46,7 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
     private boolean isFilterAmountInput = true;
     private ProductDetail product;
     private Integer productId;
+    private ImageButton backBtn, toCartBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +73,7 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
                         option_rclView.setAdapter(new Adapter_ProductDetail_ProductOptionRclView(ProductDetailActivity.this, product.productOptions, ProductDetailActivity.this));
                         ArrayList<SlideModel> sr = new ArrayList<>();
                         sr.add(new SlideModel(product.logo, ScaleTypes.CENTER_INSIDE));
-                        for (ProductDetail_ProductOption option : product.productOptions
+                        for (ProductOption option : product.productOptions
                         ) {
                             if (option.image != null && option.image.length() != 0) {
                                 sr.add(new SlideModel(localhostIp.LOCALHOST_IP.getValue() + ":3000" + option.image, ScaleTypes.CENTER_INSIDE));
@@ -127,6 +129,12 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
                 }
             }
         });
+        backBtn.setOnClickListener(v -> {
+            finish();
+        });
+        toCartBtn.setOnClickListener(v -> {
+            //to cart act
+        });
     }
 
     private void refChildComponents() {
@@ -143,6 +151,8 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
         slider = findViewById(R.id.ProductDetail_Slider);
         option_rclView = findViewById(R.id.ProductDetail_OptionList_rclView);
         amount_editTxtView = findViewById(R.id.ProductDetail_amountInp);
+        backBtn = findViewById(R.id.backBtn);
+        toCartBtn = findViewById(R.id.ToCart);
     }
 
     private void limitTextInputEditText(TextInputEditText editText) {

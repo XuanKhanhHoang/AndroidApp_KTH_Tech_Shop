@@ -2,9 +2,10 @@ package com.ktm.kthtechshop.dto;
 
 import com.google.gson.annotations.SerializedName;
 
-public class ProductDetail_ProductOption {
+public class ProductOption {
+    @SerializedName("original_price")
     public Integer originalPrice;
-    @SerializedName("price")
+    @SerializedName("selling_price")
     public Integer sellingPrice;
     public String name;
     public int id;
@@ -12,7 +13,8 @@ public class ProductDetail_ProductOption {
     public double discount;
     public String image;
 
-    public ProductDetail_ProductOption(int id, String name, Integer originalPrice, Integer sellingPrice, int amount, double discount, String image) {
+
+    public ProductOption(int id, String name, Integer originalPrice, Integer sellingPrice, int amount, double discount, String image) {
         this.originalPrice = originalPrice;
         this.sellingPrice = sellingPrice;
         this.name = name;
@@ -21,4 +23,5 @@ public class ProductDetail_ProductOption {
         this.discount = discount;
         this.image = image;
     }
+
 }

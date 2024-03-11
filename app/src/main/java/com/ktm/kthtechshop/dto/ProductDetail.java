@@ -12,11 +12,11 @@ public class ProductDetail {
     public String information;
     public float rating;
     @SerializedName("product_options")
-    public ArrayList<ProductDetail_ProductOption> productOptions;
+    public ArrayList<ProductOption> productOptions;
     public ProductDetail_Brand brand;
     public ArrayList<ProductDetail_Comment> comment;
 
-    public ProductDetail(int productId, String name, String logo, String description, String information, float rating, ArrayList<ProductDetail_ProductOption> productOptions) {
+    public ProductDetail(int productId, String name, String logo, String description, String information, float rating, ArrayList<ProductOption> productOptions) {
         this.logo = logo;
         this.name = name;
         this.description = description;
@@ -26,7 +26,7 @@ public class ProductDetail {
         this.productOptions = productOptions;
     }
 
-    public ProductDetail(int productId, String name, String logo, String description, String information, float rating, ArrayList<ProductDetail_ProductOption> productOptions, ProductDetail_Brand brand, ArrayList<ProductDetail_Comment> comment) {
+    public ProductDetail(int productId, String name, String logo, String description, String information, float rating, ArrayList<ProductOption> productOptions, ProductDetail_Brand brand, ArrayList<ProductDetail_Comment> comment) {
         this.logo = logo;
         this.name = name;
         this.description = description;

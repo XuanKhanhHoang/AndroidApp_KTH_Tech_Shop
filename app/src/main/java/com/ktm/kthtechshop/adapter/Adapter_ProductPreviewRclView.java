@@ -14,12 +14,12 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ktm.kthtechshop.ImageLoadFromURL;
 import com.ktm.kthtechshop.R;
-import com.ktm.kthtechshop.Utils;
 import com.ktm.kthtechshop.activity.ProductDetailActivity;
 import com.ktm.kthtechshop.dto.ProductPreviewItem;
 import com.ktm.kthtechshop.localhostIp;
+import com.ktm.kthtechshop.utils.ImageLoadFromURL;
+import com.ktm.kthtechshop.utils.Utils;
 
 import java.util.ArrayList;
 

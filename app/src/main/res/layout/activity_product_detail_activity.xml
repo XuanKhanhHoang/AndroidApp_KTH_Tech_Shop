@@ -13,7 +13,7 @@
         android:orientation="vertical"
         android:id="@+id/ProductDetail_RootLayout">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/linearLayout"
             android:layout_width="match_parent"
             android:layout_height="40dp"
@@ -28,27 +28,30 @@
 
 
             <ImageButton
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_marginEnd="10dp"
-                android:layout_weight="0.1"
-                android:background="#ffff"
-                android:contentDescription="@string/back_text"
-                android:src="@drawable/ic_arrow_left_solid" />
-
-            <ImageButton
-                android:id="@+id/user_btn"
+                android:id="@+id/backBtn"
                 android:layout_width="40dp"
                 android:layout_height="match_parent"
-                android:layout_margin="8px"
-                android:layout_weight="0.05"
-                android:background="@drawable/icon_user"
-                android:backgroundTint="#000"
-                android:padding="0dp"
-                android:scaleType="fitCenter"
-                android:src="@drawable/ic_star_yellow" />
+                android:background="#ffff"
+                android:contentDescription="@string/back_text"
+                android:src="@drawable/ic_arrow_left_solid"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-        </LinearLayout>
+            <ImageButton
+                android:id="@+id/ToCart"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:layout_marginEnd="40dp"
+                android:background="@drawable/ic_cart_solid"
+                android:backgroundTint="@color/light_grey"
+                android:padding="10dp"
+                android:scaleType="fitCenter"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <RelativeLayout
             android:id="@+id/relativeLayout"

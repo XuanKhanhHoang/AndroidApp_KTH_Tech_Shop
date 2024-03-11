@@ -1,4 +1,4 @@
-package com.ktm.kthtechshop;
+package com.ktm.kthtechshop.customComponents;
 
 import android.content.Context;
 import android.graphics.Typeface;

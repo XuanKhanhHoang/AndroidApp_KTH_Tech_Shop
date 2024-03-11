@@ -11,11 +11,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ktm.kthtechshop.ImageLoadFromURL;
 import com.ktm.kthtechshop.R;
 import com.ktm.kthtechshop.activity.ProductListActivity;
 import com.ktm.kthtechshop.dto.CategoryItem;
 import com.ktm.kthtechshop.localhostIp;
+import com.ktm.kthtechshop.utils.ImageLoadFromURL;
 
 import java.io.Serializable;
 import java.util.ArrayList;

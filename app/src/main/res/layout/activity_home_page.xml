@@ -46,16 +46,17 @@
                     android:layout_height="match_parent"
                     android:layout_weight="0.85"
                     android:padding="0dp"
-
                     android:theme="@style/ThemeOverlay.AppTheme.TextInputEditText.Outlined"
                     app:boxBackgroundColor="@color/white"
                     app:boxStrokeColor="@color/main"
                     app:boxStrokeWidth="1dp"
-
                     app:cursorColor="#000"
-                    app:placeholderText="@string/find_text">
+                    app:placeholderTextColor="@color/light_grey"
+                    app:placeholderText="@string/find_text"
+                    app:expandedHintEnabled="false">
 
                     <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/Global_ProductSearch_EditText"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:drawableStart="@drawable/ic_magnifying_glass_solid"
@@ -63,29 +64,31 @@
                         android:padding="0dp"
                         android:textAlignment="gravity"
                         android:textColor="@color/light_grey"
-                        android:textSize="14sp" />
+                        android:textSize="14sp"
+
+                        />
 
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <ImageButton
-                    android:id="@+id/notify_btn"
-                    android:layout_width="40dp"
+                    android:id="@+id/HomePage_CartBtn"
+                    android:layout_width="30dp"
                     android:layout_height="match_parent"
-                    android:layout_margin="8px"
-                    android:layout_weight="0.05"
-                    android:background="@android:color/transparent"
+                    android:layout_margin="8dp"
                     android:padding="0dp"
                     android:scaleType="fitCenter"
-                    android:src="@drawable/icon_noftify" />
+                    android:background="@drawable/ic_cart_solid"
+                    android:backgroundTint="@android:color/white" />
 
                 <ImageView
-                    android:id="@+id/Hompage_UserIcon_imgView"
-                    android:layout_width="40dp"
+                    android:id="@+id/HomePage_UserIcon_imgView"
+                    android:layout_width="20dp"
                     android:layout_height="match_parent"
                     android:layout_margin="8px"
                     android:layout_weight="0.05"
-                    android:background="@android:color/transparent"
+                    android:background="@drawable/shape_circle"
                     android:padding="0dp"
+                    android:backgroundTint="@color/white"
                     android:scaleType="fitCenter"
                     android:src="@drawable/icon_user" />
 
@@ -109,6 +112,7 @@
                     app:iss_auto_cycle="true"
                     app:iss_corner_radius="10"
                     app:iss_delay="3000"
+                    app:iss_placeholder="@drawable/img_loading_text"
                     app:iss_period="2000" />
             </androidx.cardview.widget.CardView>
         </RelativeLayout>
@@ -140,7 +144,7 @@
             android:layout_marginTop="10dp"
             android:padding="14dp"
             android:nestedScrollingEnabled="false"
-
+            android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/relativeLayout" />
@@ -165,7 +169,7 @@
                 android:textSize="18sp"
                 android:textStyle="bold" />
 
-            <com.ktm.kthtechshop.FontAwesome
+            <com.ktm.kthtechshop.customComponents.FontAwesome
                 android:id="@+id/flat_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

@@ -1,4 +1,4 @@
-package com.ktm.kthtechshop;
+package com.ktm.kthtechshop.staticData;
 
 public enum PromotionBannerType {
     CAROUSEL(1),

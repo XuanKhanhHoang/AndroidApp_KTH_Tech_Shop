@@ -9,19 +9,19 @@ import android.widget.RadioButton;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.ktm.kthtechshop.ProductDetail_ProductOption_ClickListener;
 import com.ktm.kthtechshop.R;
-import com.ktm.kthtechshop.dto.ProductDetail_ProductOption;
+import com.ktm.kthtechshop.dto.ProductOption;
+import com.ktm.kthtechshop.others.ProductDetail_ProductOption_ClickListener;
 
 import java.util.ArrayList;
 
 public class Adapter_ProductDetail_ProductOptionRclView extends RecyclerView.Adapter<Adapter_ProductDetail_ProductOptionRclView.ViewHolder> {
     Integer selectedItem;
     Context context;
-    ArrayList<ProductDetail_ProductOption> optionArrayList;
+    ArrayList<ProductOption> optionArrayList;
     private ProductDetail_ProductOption_ClickListener listener;
 
-    public Adapter_ProductDetail_ProductOptionRclView(Context context, ArrayList<ProductDetail_ProductOption> optionArrayList, ProductDetail_ProductOption_ClickListener listener) {
+    public Adapter_ProductDetail_ProductOptionRclView(Context context, ArrayList<ProductOption> optionArrayList, ProductDetail_ProductOption_ClickListener listener) {
         this.context = context;
         this.optionArrayList = optionArrayList;
         selectedItem = 0;
@@ -38,7 +38,7 @@ public class Adapter_ProductDetail_ProductOptionRclView extends RecyclerView.Ada
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ProductDetail_ProductOption ct = optionArrayList.get(position);
+        ProductOption ct = optionArrayList.get(position);
         holder.checkBox.setText(ct.name);
         holder.checkBox.setChecked(position == selectedItem);
     }
