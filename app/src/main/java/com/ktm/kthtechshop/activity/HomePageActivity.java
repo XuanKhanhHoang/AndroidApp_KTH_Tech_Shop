@@ -8,6 +8,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,6 +32,7 @@ import com.ktm.kthtechshop.dto.ProductListResponse;
 import com.ktm.kthtechshop.dto.ProductPreviewItem;
 import com.ktm.kthtechshop.dto.PromotionBannerItem;
 import com.ktm.kthtechshop.localhostIp;
+import com.ktm.kthtechshop.others.CategoryViewModel;
 import com.ktm.kthtechshop.staticData.PromotionBannerType;
 import com.ktm.kthtechshop.utils.ImageLoadFromURL;
 
@@ -57,6 +59,7 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
     private boolean isCheckingAccount = true;
     private ImageButton cartBtn;
     public final Integer smartphoneCategoryId = 1, laptopCategoryId = 2;
+    private CategoryViewModel categoryViewModel;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,8 +76,17 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
         setUpRclViews();
         //Call api
         checkValidUserSession();
+        categoryViewModel = new ViewModelProvider(this).get(CategoryViewModel.class);
+        categoryViewModel.getCategories().observe(this, categories -> {
+            // Update UI
+        });
+
+        // Check if categories data is already loaded
+        if (categoryViewModel.getCategories().getValue() == null) {
+            // Fetch data from server and set to ViewModel
+        }
         getPromotionBanner();
-        categoryItemArrayList.add(new CategoryItem("Loading...", "1", "1"));
+        categoryItemArrayList.add(new CategoryItem("Loading...", "1", "-1"));
         categoryRclView.setAdapter(new Adapter_CategoryRclView(getApplicationContext(), categoryItemArrayList));
         ArrayList tmp = new ArrayList<SlideModel>();
         tmp.add(new SlideModel(R.drawable.img_loading_text, ScaleTypes.FIT));
@@ -280,7 +292,7 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
                         appSharedPreferences.setAllAttribute(response.body().value.userId,
                                 response.body().accessToken, response.body().value.firstName,
                                 response.body().value.avatar);
-                        new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + response.body().value.avatar, userImgView).execute();
+                        new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + response.body().value.avatar, userImgView, R.drawable.icon_user).execute();
                     } else {
                         Toast.makeText(HomePageActivity.this, "Xác thực thất bại, vui lòng đăng nhập lại ", Toast.LENGTH_SHORT).show();
                         appSharedPreferences.clear();

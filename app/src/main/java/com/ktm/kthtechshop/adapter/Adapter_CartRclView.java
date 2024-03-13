@@ -3,7 +3,6 @@ package com.ktm.kthtechshop.adapter;
 import android.content.Context;
 import android.graphics.Paint;
 import android.text.InputFilter;
-import android.text.Spanned;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,6 +11,7 @@ import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -22,11 +22,21 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.ktm.kthtechshop.AppSharedPreferences;
 import com.ktm.kthtechshop.R;
+import com.ktm.kthtechshop.api.ApiServices;
 import com.ktm.kthtechshop.dto.CartItem;
+import com.ktm.kthtechshop.dto.CartItemSaved;
+import com.ktm.kthtechshop.dto.DeleteCartItem;
+import com.ktm.kthtechshop.localhostIp;
 import com.ktm.kthtechshop.utils.Utils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclView.ViewHolder_CartRclView> {
 
@@ -69,17 +79,29 @@ public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclVie
 
     class ViewHolder_CartRclView extends RecyclerView.ViewHolder {
         ImageView image;
-        TextView productName, optionName, sellingPrice, originalPrice;
+        TextView productName, optionName, sellingPrice, originalPrice, deleteItem;
         CheckBox checkBox;
         EditText amountEdiTxt;
         Button decreaseAmountBtn, increaseAmountBtn;
         AppSharedPreferences appSharedPreferences;
         Gson gson;
+        ApiServices apiServices;
+
+        protected void initApiService() {
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            Retrofit retrofit = new Retrofit.Builder()
+                    .baseUrl(localhostIp.LOCALHOST_IP.getValue() + ":8081/api/v1/") //for ld
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build();
+            apiServices = retrofit.create(ApiServices.class);
+        }
 
         public ViewHolder_CartRclView(@NonNull View itemView) {
             super(itemView);
+            initApiService();
             appSharedPreferences = new AppSharedPreferences((AppCompatActivity) itemView.getContext());
             image = itemView.findViewById(R.id.CartItemLayout_Image);
+            deleteItem = itemView.findViewById(R.id.CartItemLayout_DeleteItem);
             productName = itemView.findViewById(R.id.CartItemLayout_ProductName);
             optionName = itemView.findViewById(R.id.CartItemLayout_ProductOptionName);
             sellingPrice = itemView.findViewById(R.id.CartItemLayout_SellingPrice);
@@ -98,16 +120,17 @@ public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclVie
                 cartArrayList.set(selectedItem, item);
                 String cartJson = appSharedPreferences.getCart();
                 if (cartJson != null && !cartJson.isEmpty()) {
-                    Type type = new TypeToken<ArrayList<CartItem>>() {
+                    Type type = new TypeToken<ArrayList<CartItemSaved>>() {
                     }.getType();
-                    ArrayList<CartItem> cart = gson.fromJson(cartJson, type);
+                    ArrayList<CartItemSaved> cart = gson.fromJson(cartJson, type);
 
                     for (int i = 0; i < cart.size(); i++) {
 
                         if (item.cartId == cart.get(i).cartId) {
-                            cart.set(i, item);
+                            cart.set(i, new CartItemSaved(item.cartId, item.option.id, item.amount));
                             appSharedPreferences.setCart(gson.toJson(cart));
                             amountEdiTxt.setText(String.valueOf(item.amount));
+
                             break;
                         }
                     }
@@ -121,14 +144,14 @@ public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclVie
                 cartArrayList.set(selectedItem, item);
                 String cartJson = appSharedPreferences.getCart();
                 if (cartJson != null && !cartJson.isEmpty()) {
-                    Type type = new TypeToken<ArrayList<CartItem>>() {
+                    Type type = new TypeToken<ArrayList<CartItemSaved>>() {
                     }.getType();
-                    ArrayList<CartItem> cart = gson.fromJson(cartJson, type);
+                    ArrayList<CartItemSaved> cart = gson.fromJson(cartJson, type);
 
                     for (int i = 0; i < cart.size(); i++) {
 
                         if (item.cartId == cart.get(i).cartId) {
-                            cart.set(i, item);
+                            cart.set(i, new CartItemSaved(item.cartId, item.option.id, item.amount));
                             appSharedPreferences.setCart(gson.toJson(cart));
                             amountEdiTxt.setText(String.valueOf(item.amount));
 
@@ -137,46 +160,72 @@ public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclVie
                     }
                 }
             });
-            InputFilter inputFilter = new InputFilter() {
-                @Override
-                public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart, int dend) {
+            InputFilter inputFilter = (source, start, end, dest, dstart, dend) -> {
 
-                    if (!isFilterAmountInput) {
-                        //curAmount has just update before this
-//                        notifyTotalCostChange();
+                if (!isFilterAmountInput) {
+                    //curAmount has just update before this
+                    return null;
+                }
+                try {
+                    int selectedItem = getAdapterPosition();
+                    int upperBound = cartArrayList.get(selectedItem).option.amount;
+                    Integer input = Integer.parseInt(source.toString());
+                    if (source.length() == 0) {
                         return null;
                     }
-                    try {
-                        int selectedItem = getAdapterPosition();
-                        int upperBound = cartArrayList.get(selectedItem).option.amount;
-                        Integer input = Integer.parseInt(source.toString());
-                        if (source.length() == 0) {
-//                            curAmount = input;
-//                            notifyTotalCostChange();
+                    if (input >= 0) {
+                        if (amountEdiTxt.getText().length() == 0 && input < upperBound && input > 0) {
                             return null;
                         }
-                        if (input >= 0) {
-                            if (amountEdiTxt.getText().length() == 0 && input < upperBound && input > 0) {
-//                                curAmount = input;
-//                                notifyTotalCostChange();
+                        try {
+                            Integer nextVal = Integer.parseInt(amountEdiTxt.getText().toString() + input.toString());
+                            if (nextVal > 0 && nextVal <= upperBound) {
                                 return null;
                             }
-                            try {
-                                Integer nextVal = Integer.parseInt(amountEdiTxt.getText().toString() + input.toString());
-                                if (nextVal > 0 && nextVal <= upperBound) {
-//                                    curAmount = nextVal;
-//                                    notifyTotalCostChange();
-                                    return null;
-                                }
-                            } catch (NumberFormatException e) {
-                            }
+                        } catch (NumberFormatException e) {
                         }
-                    } catch (NumberFormatException e) {
                     }
-                    return "";
+                } catch (NumberFormatException e) {
                 }
+                return "";
             };
             amountEdiTxt.setFilters(new InputFilter[]{inputFilter});
+
+            deleteItem.setOnClickListener(v -> {
+                int selectedItem = getAdapterPosition();
+                int cartId = cartArrayList.get(selectedItem).cartId;
+                apiServices.deleteOptionInCart(appSharedPreferences.getBearerAccessToken(), new DeleteCartItem(cartId)).enqueue(new Callback<DeleteCartItem>() {
+
+                    @Override
+                    public void onResponse(Call<DeleteCartItem> call, Response<DeleteCartItem> response) {
+                        if (response.isSuccessful()) {
+                            String cartJson = appSharedPreferences.getCart();
+                            if (cartJson != null && !cartJson.isEmpty()) {
+                                Type type = new TypeToken<ArrayList<CartItemSaved>>() {
+                                }.getType();
+                                ArrayList<CartItemSaved> cart = gson.fromJson(cartJson, type);
+
+                                for (int i = 0; i < cart.size(); i++) {
+
+                                    if (cartId == cart.get(i).cartId) {
+                                        cart.remove(i);
+                                        appSharedPreferences.setCart(gson.toJson(cart));
+                                        cartArrayList.remove(selectedItem);
+                                        notifyDataSetChanged();
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<DeleteCartItem> call, Throwable t) {
+                        Toast.makeText(itemView.getContext(), "Xóa sản phẩm thất bại", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            });
         }
 
     }

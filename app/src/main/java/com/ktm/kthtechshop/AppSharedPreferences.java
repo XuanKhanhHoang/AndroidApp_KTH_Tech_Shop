@@ -20,6 +20,11 @@ public class AppSharedPreferences {
         return sharedPreferences.getString("accessToken", "");
     }
 
+    public String getBearerAccessToken() {
+        return "Bearer " + sharedPreferences.getString("accessToken", "");
+    }
+
+
     public Integer getUserId() {
         return sharedPreferences.getInt("userId", -1);
     }
@@ -77,7 +82,7 @@ public class AppSharedPreferences {
         editor.apply();
     }
 
-  
+
     public void clear() {
         sharedPreferences.edit().clear().apply();
         sharedPreferences.edit().putBoolean("isAuth", false).apply();

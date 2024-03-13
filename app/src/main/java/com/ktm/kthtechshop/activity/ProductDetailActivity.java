@@ -20,14 +20,22 @@ import com.denzcoskun.imageslider.ImageSlider;
 import com.denzcoskun.imageslider.constants.ScaleTypes;
 import com.denzcoskun.imageslider.models.SlideModel;
 import com.google.android.material.textfield.TextInputEditText;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
+import com.ktm.kthtechshop.AppSharedPreferences;
 import com.ktm.kthtechshop.R;
 import com.ktm.kthtechshop.adapter.Adapter_ProductDetail_ProductOptionRclView;
+import com.ktm.kthtechshop.dto.AddCartSendToServer;
+import com.ktm.kthtechshop.dto.AddOptionToCartResponse;
+import com.ktm.kthtechshop.dto.CartItemSaved;
 import com.ktm.kthtechshop.dto.ProductDetail;
 import com.ktm.kthtechshop.dto.ProductOption;
 import com.ktm.kthtechshop.localhostIp;
 import com.ktm.kthtechshop.others.ProductDetail_ProductOption_ClickListener;
 import com.ktm.kthtechshop.utils.Utils;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import retrofit2.Call;
@@ -42,11 +50,12 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
     private RecyclerView option_rclView;
     private TextInputEditText amount_editTxtView;
     private Integer totalCost, curAmount;
-    private static int curPositionOption;
+    private int curPositionOption;
     private boolean isFilterAmountInput = true;
     private ProductDetail product;
     private Integer productId;
     private ImageButton backBtn, toCartBtn;
+    private AppSharedPreferences appSharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,7 +65,9 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
         refChildComponents();
         curAmount = 1;
         curPositionOption = 0;
+        appSharedPreferences = new AppSharedPreferences(this);
         Intent it = getIntent();
+        productId = -1;
         if (it != null) {
             productId = it.getIntExtra("productId", -1);
         }
@@ -134,6 +145,51 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
         });
         toCartBtn.setOnClickListener(v -> {
             //to cart act
+
+
+        });
+        addToCart_btn.setOnClickListener(v -> {
+            if (!appSharedPreferences.getIsAuth()) {
+                Toast.makeText(this, "Vui lòng đăng nhập ", Toast.LENGTH_SHORT).show();
+                finish();
+                Intent intent = new Intent(this, LoginActivity.class);
+                ProductDetailActivity.this.startActivity(intent);
+                return;
+            }
+            String cartJson = appSharedPreferences.getCart();
+            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            int optionId = product.productOptions.get(curPositionOption).id;
+            ArrayList<CartItemSaved> cart;
+            if (cartJson != null && !cartJson.isEmpty()) {
+                Type type = new TypeToken<ArrayList<CartItemSaved>>() {
+                }.getType();
+                cart = gson.fromJson(cartJson, type);
+                for (CartItemSaved item : cart) {
+                    if (item.oId == optionId) {
+                        Toast.makeText(this, "Sản phẩm đã có trong giỏ hàng rồi !", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+
+            } else cart = new ArrayList<>();
+            apiServices.addOptionToCart(appSharedPreferences.getBearerAccessToken(), new AddCartSendToServer(optionId)).enqueue(new Callback<AddOptionToCartResponse>() {
+                @Override
+                public void onResponse(Call<AddOptionToCartResponse> call, Response<AddOptionToCartResponse> response) {
+                    if (response.isSuccessful()) {
+                        cart.add(new CartItemSaved(response.body().cartId, optionId, curAmount));
+                        appSharedPreferences.setCart(gson.toJson(cart));
+                        Toast.makeText(ProductDetailActivity.this, "Thêm vào giỏ hàng thành công !", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(ProductDetailActivity.this, "Thêm vào giỏ hàng Thất bại !", Toast.LENGTH_SHORT).show();
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<AddOptionToCartResponse> call, Throwable t) {
+                    Toast.makeText(ProductDetailActivity.this, "Thêm vào giỏ hàng Thất bại !", Toast.LENGTH_SHORT).show();
+                }
+            });
         });
     }
 

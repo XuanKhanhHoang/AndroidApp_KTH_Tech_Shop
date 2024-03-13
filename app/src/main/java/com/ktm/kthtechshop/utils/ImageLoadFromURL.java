@@ -15,9 +15,18 @@ public class ImageLoadFromURL extends AsyncTask<Void, Void, Bitmap> {
     private String url;
     private ImageView imageView;
 
+    private int IdDrawableImageError;
+
     public ImageLoadFromURL(String url, ImageView imageView) {
         this.url = url;
         this.imageView = imageView;
+        IdDrawableImageError = -1;
+    }
+
+    public ImageLoadFromURL(String url, ImageView imageView, int IdDrawableImageError) {
+        this.url = url;
+        this.imageView = imageView;
+        this.IdDrawableImageError = IdDrawableImageError;
     }
 
     @Override
@@ -39,7 +48,8 @@ public class ImageLoadFromURL extends AsyncTask<Void, Void, Bitmap> {
     @Override
     protected void onPostExecute(Bitmap result) {
         super.onPostExecute(result);
-        imageView.setImageBitmap(result);
+        if (result != null) imageView.setImageBitmap(result);
+        else if (IdDrawableImageError != -1) imageView.setImageResource(IdDrawableImageError);
     }
 
 }

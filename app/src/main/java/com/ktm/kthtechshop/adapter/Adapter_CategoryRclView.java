@@ -44,7 +44,9 @@ public class Adapter_CategoryRclView extends RecyclerView.Adapter<ViewHolder_Cat
     public void onBindViewHolder(@NonNull ViewHolder_CategoryRclView holder, int position) {
         CategoryItem ct = categoryItemArrayList.get(position);
         holder.categoryName.setText(ct.getName());
-        new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + ct.getIcon(), holder.categoryLogo).execute();
+        if (!ct.getId().equals("-1"))
+            new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + ct.getIcon(), holder.categoryLogo).execute();
+        else holder.categoryLogo.setImageResource(R.drawable.img_loading_text);
         holder.categoryLogo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

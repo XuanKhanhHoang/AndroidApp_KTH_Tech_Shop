@@ -1,6 +1,9 @@
 package com.ktm.kthtechshop.api;
 
+import com.ktm.kthtechshop.dto.AddCartSendToServer;
+import com.ktm.kthtechshop.dto.AddOptionToCartResponse;
 import com.ktm.kthtechshop.dto.CategoryItem;
+import com.ktm.kthtechshop.dto.DeleteCartItem;
 import com.ktm.kthtechshop.dto.GetCartResponse;
 import com.ktm.kthtechshop.dto.LoginResponse;
 import com.ktm.kthtechshop.dto.Login_UserInfo;
@@ -14,6 +17,7 @@ import java.util.Map;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
+import retrofit2.http.HTTP;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -40,5 +44,12 @@ public interface ApiServices {
 
     @GET("cart/getcart")
     Call<GetCartResponse> getCart(@Header("Authorization") String accessToken);
+
+    @POST("cart/addproduct")
+    Call<AddOptionToCartResponse> addOptionToCart(@Header("Authorization") String accessToken, @Body() AddCartSendToServer optionId);
+
+    @HTTP(method = "DELETE", path = "cart/deleteproduct", hasBody = true)
+    Call<DeleteCartItem> deleteOptionInCart(@Header("Authorization") String accessToken, @Body() DeleteCartItem deleteCartId);
+
 }
 

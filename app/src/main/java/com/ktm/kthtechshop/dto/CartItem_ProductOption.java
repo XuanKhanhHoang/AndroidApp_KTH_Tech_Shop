@@ -21,4 +21,9 @@ public class CartItem_ProductOption extends ProductOption {
         super(id, name, originalPrice, sellingPrice, amount, discount, image);
         this.products = new CartItem_ProductNameClass(productName);
     }
+
+    public CartItem_ProductOption(ProductOption pr, String productName) {
+        super(pr.id, pr.name, pr.originalPrice, pr.sellingPrice, pr.amount, pr.discount, pr.image);
+        this.products = new CartItem_ProductNameClass(productName);
+    }
 }

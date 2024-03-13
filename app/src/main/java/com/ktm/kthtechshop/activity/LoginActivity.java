@@ -65,8 +65,11 @@ public class LoginActivity extends NeededCallApiActivity {
                             Intent it = new Intent(v.getContext(), HomePageActivity.class);
                             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             v.getContext().startActivity(it);
+                        } else if (response.code() == 401) {
+                            Toast.makeText(LoginActivity.this, "Sai tài khoản hoạc mật khẩu ", Toast.LENGTH_SHORT).show();
+                            isLoading = false;
                         } else {
-                            Toast.makeText(LoginActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Đăng nhập thất bại ", Toast.LENGTH_SHORT).show();
                             isLoading = false;
                         }
                     }

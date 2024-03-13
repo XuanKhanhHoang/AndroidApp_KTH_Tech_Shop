@@ -140,26 +140,18 @@
                 </LinearLayout>
 
                 <TextView
+                    android:id="@+id/CartItemLayout_DeleteItem"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_marginEnd="5dp"
                     android:text="Xóa"
                     android:textAlignment="center"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/CartItemLayout_DeleteItem"
-                    app:layout_constraintTop_toTopOf="parent" />
-
-                <ImageButton
-                    android:id="@+id/CartItemLayout_DeleteItem"
-                    android:layout_width="15dp"
-                    android:layout_height="20dp"
-                    android:layout_marginEnd="20dp"
-                    android:background="@drawable/ic_x_solid"
-                    android:scaleType="fitCenter"
-                    android:backgroundTint="@color/light_grey"
+                    android:drawableEnd="@drawable/ic_x_solid_20dp"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:drawablePadding="10dp"
+                    android:layout_marginEnd="15dp" />
+
             </androidx.constraintlayout.widget.ConstraintLayout>
 
         </LinearLayout>
