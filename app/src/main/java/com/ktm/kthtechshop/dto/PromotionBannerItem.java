@@ -1,10 +1,13 @@
 package com.ktm.kthtechshop.dto;
 
+import android.graphics.Bitmap;
+
 public class PromotionBannerItem {
     private Integer id;
     private String image;
     private Integer type;
     private String name;
+    private Bitmap bitmap;
 
     public Integer getId() {
         return id;
@@ -20,6 +23,14 @@ public class PromotionBannerItem {
 
     public String getName() {
         return name;
+    }
+
+    public void setBitmap(Bitmap bitmap) {
+        this.bitmap = bitmap;
+    }
+
+    public Bitmap getBitmap() {
+        return bitmap;
     }
 
     public void setImage(String image) {

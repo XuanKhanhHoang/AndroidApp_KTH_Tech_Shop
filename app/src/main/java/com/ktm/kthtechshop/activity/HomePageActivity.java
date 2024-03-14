@@ -1,13 +1,17 @@
 package com.ktm.kthtechshop.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -27,6 +31,7 @@ import com.ktm.kthtechshop.adapter.Adapter_FlashSalePreviewRclView;
 import com.ktm.kthtechshop.adapter.Adapter_ProductPreviewRclView;
 import com.ktm.kthtechshop.adapter.Adapter_PromotionBannerStaticRclView;
 import com.ktm.kthtechshop.dto.CategoryItem;
+import com.ktm.kthtechshop.dto.CategoryItemViewModel;
 import com.ktm.kthtechshop.dto.LoginResponse;
 import com.ktm.kthtechshop.dto.ProductListResponse;
 import com.ktm.kthtechshop.dto.ProductPreviewItem;
@@ -35,22 +40,25 @@ import com.ktm.kthtechshop.localhostIp;
 import com.ktm.kthtechshop.others.CategoryViewModel;
 import com.ktm.kthtechshop.staticData.PromotionBannerType;
 import com.ktm.kthtechshop.utils.ImageLoadFromURL;
+import com.ktm.kthtechshop.utils.Utils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class HomePageActivity extends HaveProductSearchApiActivity {
-
+    static ArrayList<PromotionBannerItem> promotionStaticBannerList;
+    static ArrayList<SlideModel> promotionBannerSlideItems;
+    static CategoryViewModel categoryViewModel;
     private RecyclerView categoryRclView, promotionStaticBannerRclView, flashSaleRclView, allProductRclView, smartphoneProductRclView, laptopProductRclView;
-    private ArrayList<SlideModel> promotionBannerSlideItems;
-    private ArrayList<PromotionBannerItem> promotionBannerList, promotionStaticBannerList;
-    private ArrayList<CategoryItem> categoryItemArrayList;
+
     private ArrayList<ProductPreviewItem> flashSaleProductList, allProductArrayList, smartphoneProductList, laptopProductList;
     private ImageSlider promotionBannerSlider;
     private AppSharedPreferences appSharedPreferences;
@@ -59,7 +67,10 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
     private boolean isCheckingAccount = true;
     private ImageButton cartBtn;
     public final Integer smartphoneCategoryId = 1, laptopCategoryId = 2;
-    private CategoryViewModel categoryViewModel;
+    private ArrayList<CategoryItem> categoryList;
+    private ArrayList<CategoryItemViewModel> categoryItemArrayList;
+
+//    private Call<ProductListResponse> callLatestProduct, callLaptopProduct, callSmartPhoneProduct;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,23 +87,59 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
         setUpRclViews();
         //Call api
         checkValidUserSession();
-        categoryViewModel = new ViewModelProvider(this).get(CategoryViewModel.class);
+        //singleton categoryViewModel
+        if (categoryViewModel == null)
+            categoryViewModel = new ViewModelProvider(this).get(CategoryViewModel.class);
+        //set callback function on getCategories
         categoryViewModel.getCategories().observe(this, categories -> {
-            // Update UI
-        });
+            if (categories != null) {
+                categoryItemArrayList = categories;
+                categoryRclView.setAdapter(new Adapter_CategoryRclView(getApplicationContext(), categories));
+            }
 
-        // Check if categories data is already loaded
+        });
+        //categories is unload
         if (categoryViewModel.getCategories().getValue() == null) {
             // Fetch data from server and set to ViewModel
+            apiServices.getCategoryList().enqueue(new Callback<ArrayList<CategoryItem>>() {
+                @Override
+                public void onResponse(@NonNull Call<ArrayList<CategoryItem>> call, @NonNull Response<ArrayList<CategoryItem>> response) {
+                    if (response.isSuccessful()) {
+                        Executor executor = Executors.newSingleThreadExecutor();
+                        Handler handler = new Handler(Looper.getMainLooper());
+                        categoryItemArrayList.clear();
+                        categoryList = response.body();
+                        if (categoryList != null)
+                            for (int i = 0; i < categoryList.size(); i++) {
+                                int finalI1 = i;
+                                executor.execute(() -> {
+                                    // Công việc nền, ví dụ: tải bitmap từ URL
+                                    CategoryItem ct = categoryList.get(finalI1);
+                                    Bitmap bitmap = Utils.getBitmapFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + ct.getIcon());
+                                    handler.post(() -> {
+                                        categoryItemArrayList.add(new CategoryItemViewModel(ct.getName(), ct.getIcon(), ct.getId(), bitmap));
+                                        if (finalI1 == (categoryList.size() - 1)) {
+                                            categoryViewModel.setCategories(categoryItemArrayList);
+                                        }
+                                    });
+
+                                });
+
+                            }
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<ArrayList<CategoryItem>> call, @NonNull Throwable t) {
+                    Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
+        //Get item
         getPromotionBanner();
-        categoryItemArrayList.add(new CategoryItem("Loading...", "1", "-1"));
-        categoryRclView.setAdapter(new Adapter_CategoryRclView(getApplicationContext(), categoryItemArrayList));
-        ArrayList tmp = new ArrayList<SlideModel>();
-        tmp.add(new SlideModel(R.drawable.img_loading_text, ScaleTypes.FIT));
-        promotionBannerSlider.setImageList(tmp);
-        getCategory();
+        //FlashSale is hardcode now
         getFlashSaleProduct();
+        //Get Product
         getLatestProduct();
         getSmartPhoneProduct();
         getLaptopProduct();
@@ -118,12 +165,11 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
     }
 
     protected void initLists() {
-        promotionBannerSlideItems = new ArrayList<>();
-        promotionBannerList = new ArrayList<>();
-        promotionStaticBannerList = new ArrayList<>();
+
         categoryItemArrayList = new ArrayList<>();
         flashSaleProductList = new ArrayList<>();
         allProductArrayList = new ArrayList<>();
+        categoryList = new ArrayList<>();
     }
 
     protected void setUpRclViews() {
@@ -146,58 +192,56 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
     }
 
     private void getPromotionBanner() {
-        apiServices.getListPromotionBanner().enqueue(new Callback<ArrayList<PromotionBannerItem>>() {
-            @Override
-            public void onResponse(Call<ArrayList<PromotionBannerItem>> call, Response<ArrayList<PromotionBannerItem>> response) {
-                if (response.isSuccessful()) {
-                    promotionBannerList = response.body();
-                    //Split to static banner and carousel banner
-                    if (promotionBannerList != null && promotionBannerList.size() > 0) {
-                        for (PromotionBannerItem item : promotionBannerList) {
-                            item.setImage(localhostIp.LOCALHOST_IP.getValue() + ":3000" + item.getImage());
-                            if (item.getType() == PromotionBannerType.CAROUSEL.getValue()) {
-                                promotionBannerSlideItems.add(new SlideModel(item.getImage(), ScaleTypes.FIT));
-
-                            } else {
-                                promotionStaticBannerList.add(item);
+        if (promotionBannerSlideItems == null && promotionStaticBannerList == null) {
+            promotionBannerSlideItems = new ArrayList<>();
+            promotionStaticBannerList = new ArrayList<>();
+            ArrayList<SlideModel> tmp = new ArrayList<SlideModel>();
+            tmp.add(new SlideModel(R.drawable.img_loading_text, ScaleTypes.CENTER_INSIDE));
+            promotionBannerSlider.setImageList(tmp);
+            apiServices.getListPromotionBanner().enqueue(new Callback<ArrayList<PromotionBannerItem>>() {
+                @Override
+                public void onResponse(@NonNull Call<ArrayList<PromotionBannerItem>> call, @NonNull Response<ArrayList<PromotionBannerItem>> response) {
+                    if (response.isSuccessful()) {
+                        ArrayList<PromotionBannerItem> tmp = response.body();
+                        //Split to static banner and carousel banner
+                        if (tmp != null && tmp.size() > 0) {
+                            for (PromotionBannerItem item : tmp) {
+                                item.setImage(localhostIp.LOCALHOST_IP.getValue() + ":3000" + item.getImage());
+                                if (item.getType() == PromotionBannerType.CAROUSEL.getValue()) {
+                                    promotionBannerSlideItems.add(new SlideModel(item.getImage(), ScaleTypes.CENTER_INSIDE));
+                                } else {
+                                    promotionStaticBannerList.add(item);
+                                }
                             }
+
                         }
+                        if (promotionStaticBannerList.size() == 0)
+                            promotionStaticBannerRclView.setVisibility(View.GONE);
+                        promotionStaticBannerRclView.setAdapter(new Adapter_PromotionBannerStaticRclView(getApplicationContext(), promotionStaticBannerList));
+                        promotionBannerSlider.setImageList(promotionBannerSlideItems);
 
+                    } else {
+                        promotionStaticBannerRclView.setVisibility(View.GONE);
+                        Toast.makeText(HomePageActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
                     }
-                    promotionStaticBannerRclView.setVisibility(View.VISIBLE);
-                    promotionBannerSlider.setImageList(promotionBannerSlideItems);
-                    promotionStaticBannerRclView.setAdapter(new Adapter_PromotionBannerStaticRclView(getApplicationContext(), promotionStaticBannerList));
-
-                } else {
-                    Toast.makeText(HomePageActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
                 }
-            }
 
-            @Override
-            public void onFailure(Call<ArrayList<PromotionBannerItem>> call, Throwable t) {
-                Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
-            }
-        });
+                @Override
+                public void onFailure(@NonNull Call<ArrayList<PromotionBannerItem>> call, @NonNull Throwable t) {
+                    promotionStaticBannerRclView.setVisibility(View.GONE);
+                    Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } else {
+            if (promotionStaticBannerList.size() == 0)
+                promotionStaticBannerRclView.setVisibility(View.GONE);
+            promotionStaticBannerRclView.setAdapter(new Adapter_PromotionBannerStaticRclView(getApplicationContext(), promotionStaticBannerList));
+            promotionBannerSlider.setImageList(promotionBannerSlideItems);
+        }
+
     }
 
-    private void getCategory() {
-        apiServices.getCategoryList().enqueue(new Callback<ArrayList<CategoryItem>>() {
-            @Override
-            public void onResponse(Call<ArrayList<CategoryItem>> call, Response<ArrayList<CategoryItem>> response) {
-                if (response.isSuccessful()) {
-                    categoryItemArrayList = response.body();
-                    categoryRclView.setAdapter(new Adapter_CategoryRclView(getApplicationContext(), categoryItemArrayList));
-                } else {
-                    Toast.makeText(HomePageActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(Call<ArrayList<CategoryItem>> call, Throwable t) {
-                Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
 
     private void getFlashSaleProduct() {
         float rating = 3.4f;
@@ -215,11 +259,12 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
         mp.put("product_per_page", "6");
         apiServices.getProductList(mp).enqueue(new Callback<ProductListResponse>() {
             @Override
-            public void onResponse(Call<ProductListResponse> call, Response<ProductListResponse> response) {
+            public void onResponse(@NonNull Call<ProductListResponse> call, @NonNull Response<ProductListResponse> response) {
                 if (response.isSuccessful()) {
                     ProductListResponse pr = (ProductListResponse) (response.body());
                     if (pr != null && pr.totalPage > 0)
                         findViewById(R.id.allProductNoProduct_textView).setVisibility(View.INVISIBLE);
+                    assert pr != null;
                     allProductArrayList = pr.data;
                     allProductRclView.setAdapter(new Adapter_ProductPreviewRclView(getApplicationContext(), allProductArrayList));
                 } else {
@@ -228,7 +273,7 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
             }
 
             @Override
-            public void onFailure(Call<ProductListResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<ProductListResponse> call, @NonNull Throwable t) {
                 Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
             }
         });
@@ -239,11 +284,12 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
         mp1.put("category_id", "1");
         apiServices.getProductList(mp1).enqueue(new Callback<ProductListResponse>() {
             @Override
-            public void onResponse(Call<ProductListResponse> call, Response<ProductListResponse> response) {
+            public void onResponse(@NonNull Call<ProductListResponse> call, @NonNull Response<ProductListResponse> response) {
                 if (response.isSuccessful()) {
                     ProductListResponse pr = (ProductListResponse) (response.body());
                     if (pr != null && pr.totalPage > 0)
                         findViewById(R.id.smartphoneListNoProduct_textView).setVisibility(View.INVISIBLE);
+                    assert pr != null;
                     smartphoneProductList = pr.data;
                     smartphoneProductRclView.setAdapter(new Adapter_ProductPreviewRclView(getApplicationContext(), smartphoneProductList));
                 } else {
@@ -252,7 +298,7 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
             }
 
             @Override
-            public void onFailure(Call<ProductListResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<ProductListResponse> call, @NonNull Throwable t) {
                 Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
             }
         });
@@ -263,11 +309,12 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
         mp2.put("category_id", "2");
         apiServices.getProductList(mp2).enqueue(new Callback<ProductListResponse>() {
             @Override
-            public void onResponse(Call<ProductListResponse> call, Response<ProductListResponse> response) {
+            public void onResponse(@NonNull Call<ProductListResponse> call, @NonNull Response<ProductListResponse> response) {
                 if (response.isSuccessful()) {
                     ProductListResponse pr = (ProductListResponse) (response.body());
                     if (pr != null && pr.totalPage > 0)
                         findViewById(R.id.laptop_no_product_textView).setVisibility(View.INVISIBLE);
+                    assert pr != null;
                     laptopProductList = pr.data;
                     laptopProductRclView.setAdapter(new Adapter_ProductPreviewRclView(getApplicationContext(), laptopProductList));
                 } else {
@@ -276,7 +323,7 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
             }
 
             @Override
-            public void onFailure(Call<ProductListResponse> call, Throwable t) {
+            public void onFailure(@NonNull Call<ProductListResponse> call, @NonNull Throwable t) {
                 Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
             }
         });
@@ -287,7 +334,7 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
         if (!accessToken.isEmpty() || appSharedPreferences.getIsAuth()) {
             apiServices.loginWithAccessToken("Bearer " + accessToken).enqueue(new Callback<LoginResponse>() {
                 @Override
-                public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
+                public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
                     if (response.isSuccessful()) {
                         appSharedPreferences.setAllAttribute(response.body().value.userId,
                                 response.body().accessToken, response.body().value.firstName,
@@ -303,7 +350,7 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
                 }
 
                 @Override
-                public void onFailure(Call<LoginResponse> call, Throwable t) {
+                public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
                     Toast.makeText(HomePageActivity.this, "Xác thực thất bại, vui lòng đăng nhập lại ", Toast.LENGTH_SHORT).show();
                     appSharedPreferences.clear();
                     userImgView.setImageResource(R.drawable.icon_user);
@@ -326,36 +373,6 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
                 }
             }
         });
-        ImageButton cartBtn = findViewById(R.id.HomePage_CartBtn);
-        cartBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent it = new Intent(HomePageActivity.this, CartActivity.class);
-                it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                HomePageActivity.this.startActivity(it);
-            }
-        });
-        latestProductBtnMore.setOnClickListener((v) -> {
-            Intent it = new Intent(v.getContext(), ProductListActivity.class);
-            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            v.getContext().startActivity(it);
-        });
-        smartPhoneBtnMore.setOnClickListener((v) -> {
-            Intent it = new Intent(v.getContext(), ProductListActivity.class);
-            Map<String, String> mp = new HashMap<String, String>();
-            mp.put("category_id", smartphoneCategoryId.toString());
-            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            it.putExtra("queryParams", (Serializable) mp);
-            v.getContext().startActivity(it);
-        });
-        laptopBtnMore.setOnClickListener((v) -> {
-            Intent it = new Intent(v.getContext(), ProductListActivity.class);
-            Map<String, String> mp = new HashMap<String, String>();
-            mp.put("category_id", laptopCategoryId.toString());
-            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            it.putExtra("queryParams", (Serializable) mp);
-            v.getContext().startActivity(it);
-        });
         userImgView.setOnClickListener(v -> {
             if (!isCheckingAccount) {
                 if (!appSharedPreferences.getIsAuth() || appSharedPreferences.getAccessToken().isEmpty()) {
@@ -367,6 +384,14 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
                 }
             }
         });
+
+        ImageButton cartBtn = findViewById(R.id.HomePage_CartBtn);
+        cartBtn.setOnClickListener(v -> {
+            Intent it = new Intent(HomePageActivity.this, CartActivity.class);
+            it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            HomePageActivity.this.startActivity(it);
+        });
+
         latestProductBtnMore.setOnClickListener((v) -> {
             Intent it = new Intent(v.getContext(), ProductListActivity.class);
             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -386,6 +411,11 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
             mp.put("category_id", laptopCategoryId.toString());
             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             it.putExtra("queryParams", (Serializable) mp);
+            v.getContext().startActivity(it);
+        });
+        latestProductBtnMore.setOnClickListener((v) -> {
+            Intent it = new Intent(v.getContext(), ProductListActivity.class);
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             v.getContext().startActivity(it);
         });
     }

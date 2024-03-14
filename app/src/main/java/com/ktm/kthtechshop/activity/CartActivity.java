@@ -2,6 +2,7 @@ package com.ktm.kthtechshop.activity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -31,7 +32,8 @@ public class CartActivity extends NeededCallApiActivity {
     private AppSharedPreferences appSharedPreferences;
     private RecyclerView cartRclView;
     private ArrayList<CartItem> cartItems;
-//    private boolean isCheckingAccount = true;
+    //    private boolean isCheckingAccount = true;
+    private ImageButton backBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,7 +78,10 @@ public class CartActivity extends NeededCallApiActivity {
         }
         cartRclView = findViewById(R.id.Cart_CartProduct_rclView);
         cartRclView.setHasFixedSize(true);
-
+        backBtn = findViewById(R.id.backBtn);
+        backBtn.setOnClickListener(v -> {
+            finish();
+        });
     }
 
     private void getCart(String accessToken) {

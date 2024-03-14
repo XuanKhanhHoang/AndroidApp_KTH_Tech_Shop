@@ -13,9 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ktm.kthtechshop.R;
 import com.ktm.kthtechshop.activity.ProductListActivity;
-import com.ktm.kthtechshop.dto.CategoryItem;
-import com.ktm.kthtechshop.localhostIp;
-import com.ktm.kthtechshop.utils.ImageLoadFromURL;
+import com.ktm.kthtechshop.dto.CategoryItemViewModel;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -25,9 +23,9 @@ import java.util.Map;
 public class Adapter_CategoryRclView extends RecyclerView.Adapter<ViewHolder_CategoryRclView> {
 
     Context context;
-    ArrayList<CategoryItem> categoryItemArrayList;
+    ArrayList<CategoryItemViewModel> categoryItemArrayList;
 
-    public Adapter_CategoryRclView(Context context, ArrayList<CategoryItem> categoryItemArrayList) {
+    public Adapter_CategoryRclView(Context context, ArrayList<CategoryItemViewModel> categoryItemArrayList) {
         this.context = context;
         this.categoryItemArrayList = categoryItemArrayList;
     }
@@ -42,10 +40,10 @@ public class Adapter_CategoryRclView extends RecyclerView.Adapter<ViewHolder_Cat
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder_CategoryRclView holder, int position) {
-        CategoryItem ct = categoryItemArrayList.get(position);
+        CategoryItemViewModel ct = categoryItemArrayList.get(position);
         holder.categoryName.setText(ct.getName());
         if (!ct.getId().equals("-1"))
-            new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + ct.getIcon(), holder.categoryLogo).execute();
+            holder.categoryLogo.setImageBitmap(ct.imageBitmap);
         else holder.categoryLogo.setImageResource(R.drawable.img_loading_text);
         holder.categoryLogo.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -16,6 +16,7 @@ public class ImageLoadFromURL extends AsyncTask<Void, Void, Bitmap> {
     private ImageView imageView;
 
     private int IdDrawableImageError;
+    private Bitmap bitmap;
 
     public ImageLoadFromURL(String url, ImageView imageView) {
         this.url = url;
@@ -52,4 +53,5 @@ public class ImageLoadFromURL extends AsyncTask<Void, Void, Bitmap> {
         else if (IdDrawableImageError != -1) imageView.setImageResource(IdDrawableImageError);
     }
 
+   
 }
