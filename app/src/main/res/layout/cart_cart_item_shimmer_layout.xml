@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<com.facebook.shimmer.ShimmerFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -13,7 +13,7 @@
         android:paddingVertical="5dp">
 
         <CheckBox
-            android:id="@+id/CartItemLayout_CheckBox"
+            android:id="@+id/CartItemShimmerLayout_CheckBox"
             android:layout_width="40dp"
             android:scaleX="1.25"
             android:scaleY="1.25"
@@ -25,11 +25,11 @@
             android:button="@drawable/shape_abc" />
 
         <ImageView
-            android:id="@+id/CartItemLayout_Image"
+            android:id="@+id/CartItemShimmerLayout_Image"
             android:layout_width="100dp"
             android:layout_height="100dp"
             android:scaleType="fitCenter"
-            android:src="@drawable/s23_xang" />
+            android:background="#D1D1D1" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -37,16 +37,17 @@
             android:orientation="vertical">
 
             <TextView
-                android:id="@+id/CartItemLayout_ProductName"
-                android:layout_width="match_parent"
+                android:id="@+id/CartItemShimmerLayout_ProductName"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:paddingStart="4dp"
-                android:text="Samsung s23 ultra  "
+                android:text=""
+                android:background="#D1D1D1"
                 android:textSize="16sp" />
 
             <TextView
-                android:id="@+id/CartItemLayout_ProductOptionName"
-                android:layout_width="wrap_content"
+                android:id="@+id/CartItemShimmerLayout_ProductOptionName"
+                android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:paddingHorizontal="15dp"
                 android:background="#E4E4E4"
@@ -54,32 +55,31 @@
                 android:layout_marginVertical="3dp"
                 android:paddingVertical="1dp"
                 android:textColor="#707070"
-                android:fontFamily="sans-serif-light"
-                android:text="Blue , 128 GB" />
+                android:fontFamily="sans-serif-light" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <TextView
-                    android:id="@+id/CartItemLayout_SellingPrice"
+                    android:id="@+id/CartItemShimmerLayout_SellingPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingVertical="2dp"
                     android:paddingStart="4dp"
-                    android:text="12.000.000 đ"
+                    android:text=""
                     android:textSize="18sp"
                     android:textColor="#FF5722"
                     android:fontFamily="sans-serif-medium" />
 
                 <TextView
-                    android:id="@+id/CartItemLayout_OriginalPrice"
+                    android:id="@+id/CartItemShimmerLayout_OriginalPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:paddingVertical="2dp"
                     android:layout_marginStart="15dp"
                     android:paddingStart="4dp"
-                    android:text="12.000.000 đ"
+                    android:text=""
                     android:textColor="@color/light_grey"
                     android:textSize="13sp"
                     android:fontFamily="sans-serif-medium" />
@@ -102,7 +102,7 @@
                     app:layout_constraintTop_toTopOf="parent">
 
                     <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/CartItemLayout_DecreaseAmount"
+                        android:id="@+id/CartItemShimmerLayout_DecreaseAmount"
                         android:layout_width="40dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -118,7 +118,7 @@
 
 
                     <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/CartItemLayout_AmountInp"
+                        android:id="@+id/CartItemShimmerLayout_AmountInp"
                         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="60dp"
                         android:layout_height="match_parent"
@@ -132,7 +132,7 @@
                         android:textStyle="bold" />
 
                     <androidx.appcompat.widget.AppCompatButton
-                        android:id="@+id/CartItemLayout_IncreaseAmount"
+                        android:id="@+id/CartItemShimmerLayout_IncreaseAmount"
                         android:layout_width="40dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center"
@@ -146,7 +146,7 @@
                 </LinearLayout>
 
                 <TextView
-                    android:id="@+id/CartItemLayout_DeleteItem"
+                    android:id="@+id/CartItemShimmerLayout_DeleteItem"
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:text="Xóa"
@@ -162,4 +162,4 @@
 
         </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</com.facebook.shimmer.ShimmerFrameLayout>

@@ -27,6 +27,7 @@ import com.ktm.kthtechshop.dto.CartItem;
 import com.ktm.kthtechshop.dto.CartItemSaved;
 import com.ktm.kthtechshop.dto.DeleteCartItem;
 import com.ktm.kthtechshop.localhostIp;
+import com.ktm.kthtechshop.others.Cart_CartItem_Checked_Listener;
 import com.ktm.kthtechshop.utils.Utils;
 
 import java.lang.reflect.Type;
@@ -43,10 +44,12 @@ public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclVie
     Context context;
     ArrayList<CartItem> cartArrayList;
     boolean isFilterAmountInput = false;
+    private Cart_CartItem_Checked_Listener listener;
 
-    public Adapter_CartRclView(Context context, ArrayList<CartItem> cartArrayList) {
+    public Adapter_CartRclView(Context context, ArrayList<CartItem> cartArrayList, Cart_CartItem_Checked_Listener listener) {
         this.context = context;
         this.cartArrayList = cartArrayList;
+        this.listener = listener;
     }
 
 
@@ -88,7 +91,7 @@ public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclVie
         ApiServices apiServices;
 
         protected void initApiService() {
-            Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+            gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(localhostIp.LOCALHOST_IP.getValue() + ":8081/api/v1/") //for ld
                     .addConverterFactory(GsonConverterFactory.create(gson))
@@ -110,7 +113,8 @@ public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclVie
             amountEdiTxt = itemView.findViewById(R.id.CartItemLayout_AmountInp);
             decreaseAmountBtn = itemView.findViewById(R.id.CartItemLayout_DecreaseAmount);
             increaseAmountBtn = itemView.findViewById(R.id.CartItemLayout_IncreaseAmount);
-            gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
+
+            checkBox.setOnCheckedChangeListener((buttonView, isChecked) -> listener.OnCartItemClick(getAdapterPosition()));
 
             decreaseAmountBtn.setOnClickListener(v -> {
                 int selectedItem = getAdapterPosition();
@@ -130,8 +134,8 @@ public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclVie
                             cart.set(i, new CartItemSaved(item.cartId, item.option.id, item.amount));
                             appSharedPreferences.setCart(gson.toJson(cart));
                             amountEdiTxt.setText(String.valueOf(item.amount));
-
-                            break;
+                            listener.OnCartItemAmountChange(selectedItem, item.amount);
+                            return;
                         }
                     }
                 }
@@ -154,8 +158,8 @@ public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclVie
                             cart.set(i, new CartItemSaved(item.cartId, item.option.id, item.amount));
                             appSharedPreferences.setCart(gson.toJson(cart));
                             amountEdiTxt.setText(String.valueOf(item.amount));
-
-                            break;
+                            listener.OnCartItemAmountChange(selectedItem, item.amount);
+                            return;
                         }
                     }
                 }
@@ -175,11 +179,13 @@ public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclVie
                     }
                     if (input >= 0) {
                         if (amountEdiTxt.getText().length() == 0 && input < upperBound && input > 0) {
+                            listener.OnCartItemAmountChange(selectedItem, input);
                             return null;
                         }
                         try {
                             Integer nextVal = Integer.parseInt(amountEdiTxt.getText().toString() + input.toString());
                             if (nextVal > 0 && nextVal <= upperBound) {
+                                listener.OnCartItemAmountChange(selectedItem, nextVal);
                                 return null;
                             }
                         } catch (NumberFormatException e) {
@@ -192,8 +198,9 @@ public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclVie
             amountEdiTxt.setFilters(new InputFilter[]{inputFilter});
 
             deleteItem.setOnClickListener(v -> {
-                int selectedItem = getAdapterPosition();
-                int cartId = cartArrayList.get(selectedItem).cartId;
+                int itemPos = getAdapterPosition();
+                CartItem selectedItem = cartArrayList.get(itemPos);
+                int cartId = selectedItem.cartId;
                 apiServices.deleteOptionInCart(appSharedPreferences.getBearerAccessToken(), new DeleteCartItem(cartId)).enqueue(new Callback<DeleteCartItem>() {
 
                     @Override
@@ -210,7 +217,8 @@ public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclVie
                                     if (cartId == cart.get(i).cartId) {
                                         cart.remove(i);
                                         appSharedPreferences.setCart(gson.toJson(cart));
-                                        cartArrayList.remove(selectedItem);
+                                        cartArrayList.remove(itemPos);
+                                        listener.OnCartItemDelete(cartId, selectedItem.option.sellingPrice);
                                         notifyDataSetChanged();
                                         break;
                                     }

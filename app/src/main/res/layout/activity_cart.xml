@@ -55,15 +55,21 @@
             android:layout_height="60dp"
             android:orientation="horizontal"
             android:padding="3dp"
-
             android:gravity="center_vertical">
 
             <CheckBox
                 android:id="@+id/Cart_CheckAll_ckb"
                 android:layout_width="wrap_content"
+                android:scaleX="1"
+                android:scaleY="1"
+                android:gravity="center"
+                android:layout_marginStart="15dp"
                 android:layout_height="match_parent"
-                android:layout_margin="0dp"
-                android:text="Tất cả" />
+                app:buttonTint="@color/white"
+                android:buttonTintMode="multiply"
+                android:text="  Tất cả"
+                android:textSize="12sp"
+                android:button="@drawable/shape_abc" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -73,6 +79,7 @@
                 android:gravity="center_vertical" />
 
             <TextView
+                android:id="@+id/Cart_TotalCost_txtView"
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:text="12.389.999đ"
@@ -81,6 +88,7 @@
                 android:gravity="center" />
 
             <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/Cart_Payment_Btn"
                 android:layout_width="80dp"
                 android:layout_height="match_parent"
                 android:text="Mua Hàng"
@@ -104,4 +112,358 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/ln" />
 
+    <LinearLayout
+        android:id="@+id/Cart_CartProduct_Shimmer_lnView"
+        android:layout_width="409dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:nestedScrollingEnabled="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ln"
+        android:orientation="vertical">
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/Cart_CartProduct_Shimmer1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="1dp"
+            app:shimmer_base_color="@color/light_grey">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:paddingVertical="5dp">
+
+                <CheckBox
+                    android:layout_width="40dp"
+                    android:scaleX="1.25"
+                    android:scaleY="1.25"
+                    android:gravity="center"
+                    android:layout_marginStart="5dp"
+                    android:layout_height="match_parent"
+                    app:buttonTint="@color/white"
+                    android:buttonTintMode="multiply"
+                    android:button="@drawable/shape_abc" />
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:scaleType="fitCenter"
+                    android:background="#D1D1D1" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="4dp"
+                        android:text=""
+                        android:background="#D1D1D1"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="15dp"
+                        android:background="#E4E4E4"
+                        android:textSize="13sp"
+                        android:layout_marginVertical="3dp"
+                        android:paddingVertical="1dp"
+                        android:textColor="#707070"
+                        android:fontFamily="sans-serif-light" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="2dp"
+                            android:paddingStart="4dp"
+                            android:text=""
+                            android:textSize="18sp"
+                            android:textColor="#FF5722"
+                            android:fontFamily="sans-serif-medium" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="2dp"
+                            android:layout_marginStart="15dp"
+                            android:paddingStart="4dp"
+                            android:text=""
+                            android:textColor="@color/light_grey"
+                            android:textSize="13sp"
+                            android:fontFamily="sans-serif-medium" />
+                    </LinearLayout>
+
+
+                </LinearLayout>
+            </LinearLayout>
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/Cart_CartProduct_Shimmer2"
+            android:layout_width="match_parent"
+
+
+            android:layout_height="wrap_content"
+            android:paddingBottom="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:paddingVertical="5dp">
+
+                <CheckBox
+                    android:layout_width="40dp"
+                    android:scaleX="1.25"
+                    android:scaleY="1.25"
+                    android:gravity="center"
+                    android:layout_marginStart="5dp"
+                    android:layout_height="match_parent"
+                    app:buttonTint="@color/white"
+                    android:buttonTintMode="multiply"
+                    android:button="@drawable/shape_abc" />
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:scaleType="fitCenter"
+                    android:background="#D1D1D1" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="4dp"
+                        android:text=""
+                        android:background="#D1D1D1"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="15dp"
+                        android:background="#E4E4E4"
+                        android:textSize="13sp"
+                        android:layout_marginVertical="3dp"
+                        android:paddingVertical="1dp"
+                        android:textColor="#707070"
+                        android:fontFamily="sans-serif-light" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="2dp"
+                            android:paddingStart="4dp"
+                            android:text=""
+                            android:textSize="18sp"
+                            android:textColor="#FF5722"
+                            android:fontFamily="sans-serif-medium" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="2dp"
+                            android:layout_marginStart="15dp"
+                            android:paddingStart="4dp"
+                            android:text=""
+                            android:textColor="@color/light_grey"
+                            android:textSize="13sp"
+                            android:fontFamily="sans-serif-medium" />
+                    </LinearLayout>
+
+
+                </LinearLayout>
+            </LinearLayout>
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/Cart_CartProduct_Shimmer3"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="1dp"
+
+
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:paddingVertical="5dp">
+
+                <CheckBox
+                    android:layout_width="40dp"
+                    android:scaleX="1.25"
+                    android:scaleY="1.25"
+                    android:gravity="center"
+                    android:layout_marginStart="5dp"
+                    android:layout_height="match_parent"
+                    app:buttonTint="@color/white"
+                    android:buttonTintMode="multiply"
+                    android:button="@drawable/shape_abc" />
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:scaleType="fitCenter"
+                    android:background="#D1D1D1" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="4dp"
+                        android:text=""
+                        android:background="#D1D1D1"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="15dp"
+                        android:background="#E4E4E4"
+                        android:textSize="13sp"
+                        android:layout_marginVertical="3dp"
+                        android:paddingVertical="1dp"
+                        android:textColor="#707070"
+                        android:fontFamily="sans-serif-light" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="2dp"
+                            android:paddingStart="4dp"
+                            android:text=""
+                            android:textSize="18sp"
+                            android:textColor="#FF5722"
+                            android:fontFamily="sans-serif-medium" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="2dp"
+                            android:layout_marginStart="15dp"
+                            android:paddingStart="4dp"
+                            android:text=""
+                            android:textColor="@color/light_grey"
+                            android:textSize="13sp"
+                            android:fontFamily="sans-serif-medium" />
+                    </LinearLayout>
+
+
+                </LinearLayout>
+            </LinearLayout>
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+        <com.facebook.shimmer.ShimmerFrameLayout
+            android:id="@+id/Cart_CartProduct_Shimmer4"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingBottom="1dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/white"
+                android:paddingVertical="5dp">
+
+                <CheckBox
+                    android:layout_width="40dp"
+                    android:scaleX="1.25"
+                    android:scaleY="1.25"
+                    android:gravity="center"
+                    android:layout_marginStart="5dp"
+                    android:layout_height="match_parent"
+                    app:buttonTint="@color/white"
+                    android:buttonTintMode="multiply"
+                    android:button="@drawable/shape_abc" />
+
+                <ImageView
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:scaleType="fitCenter"
+                    android:background="#D1D1D1" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="200dp"
+                        android:layout_height="wrap_content"
+                        android:paddingStart="4dp"
+                        android:text=""
+                        android:background="#D1D1D1"
+                        android:textSize="16sp" />
+
+                    <TextView
+                        android:layout_width="100dp"
+                        android:layout_height="wrap_content"
+                        android:paddingHorizontal="15dp"
+                        android:background="#E4E4E4"
+                        android:textSize="13sp"
+                        android:layout_marginVertical="3dp"
+                        android:paddingVertical="1dp"
+                        android:textColor="#707070"
+                        android:fontFamily="sans-serif-light" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="2dp"
+                            android:paddingStart="4dp"
+                            android:text=""
+                            android:textSize="18sp"
+                            android:textColor="#FF5722"
+                            android:fontFamily="sans-serif-medium" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingVertical="2dp"
+                            android:layout_marginStart="15dp"
+                            android:paddingStart="4dp"
+                            android:text=""
+                            android:textColor="@color/light_grey"
+                            android:textSize="13sp"
+                            android:fontFamily="sans-serif-medium" />
+                    </LinearLayout>
+
+
+                </LinearLayout>
+            </LinearLayout>
+        </com.facebook.shimmer.ShimmerFrameLayout>
+
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

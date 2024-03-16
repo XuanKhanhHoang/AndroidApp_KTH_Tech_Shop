@@ -1,0 +1,28 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="false">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="#FFFFFF" /> <!-- Màu nền trắng -->
+                    <stroke android:width="1dp" android:color="#676767" /> <!-- Đường viền màu đen -->
+                    <corners android:radius="1dp" />
+                    <size android:width="15dp" android:height="15dp" /> <!-- Kích thước của hình vuông -->
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <item android:state_checked="true">
+        <layer-list>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="#FFFFFF"/> <!-- Màu nền trắng -->
+                    <stroke android:width="1dp" android:color="#676767"/> <!-- Đường viền màu đen -->
+                    <corners android:radius="1dp"/>
+                    <size android:width="15dp" android:height="15dp"/> <!-- Kích thước của hình vuông -->
+                </shape>
+            </item>
+            <item android:drawable="@drawable/ic_check_solid" android:gravity="center" />
+        </layer-list>
+    </item>
+
+</selector>

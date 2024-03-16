@@ -101,39 +101,7 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
         //categories is unload
         if (categoryViewModel.getCategories().getValue() == null) {
             // Fetch data from server and set to ViewModel
-            apiServices.getCategoryList().enqueue(new Callback<ArrayList<CategoryItem>>() {
-                @Override
-                public void onResponse(@NonNull Call<ArrayList<CategoryItem>> call, @NonNull Response<ArrayList<CategoryItem>> response) {
-                    if (response.isSuccessful()) {
-                        Executor executor = Executors.newSingleThreadExecutor();
-                        Handler handler = new Handler(Looper.getMainLooper());
-                        categoryItemArrayList.clear();
-                        categoryList = response.body();
-                        if (categoryList != null)
-                            for (int i = 0; i < categoryList.size(); i++) {
-                                int finalI1 = i;
-                                executor.execute(() -> {
-                                    // Công việc nền, ví dụ: tải bitmap từ URL
-                                    CategoryItem ct = categoryList.get(finalI1);
-                                    Bitmap bitmap = Utils.getBitmapFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + ct.getIcon());
-                                    handler.post(() -> {
-                                        categoryItemArrayList.add(new CategoryItemViewModel(ct.getName(), ct.getIcon(), ct.getId(), bitmap));
-                                        if (finalI1 == (categoryList.size() - 1)) {
-                                            categoryViewModel.setCategories(categoryItemArrayList);
-                                        }
-                                    });
-
-                                });
-
-                            }
-                    }
-                }
-
-                @Override
-                public void onFailure(@NonNull Call<ArrayList<CategoryItem>> call, @NonNull Throwable t) {
-                    Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
-                }
-            });
+            handleGetCategoriesFromApi();
         }
         //Get item
         getPromotionBanner();
@@ -146,6 +114,43 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
         //setup button click listener
         setUpButtonsOnClickListen();
         setUpSearchFunction();
+
+    }
+
+    private void handleGetCategoriesFromApi() {
+        apiServices.getCategoryList().enqueue(new Callback<ArrayList<CategoryItem>>() {
+            @Override
+            public void onResponse(@NonNull Call<ArrayList<CategoryItem>> call, @NonNull Response<ArrayList<CategoryItem>> response) {
+                if (response.isSuccessful()) {
+                    Executor executor = Executors.newSingleThreadExecutor();
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    categoryItemArrayList.clear();
+                    categoryList = response.body();
+                    if (categoryList != null)
+                        for (int i = 0; i < categoryList.size(); i++) {
+                            int finalI1 = i;
+                            executor.execute(() -> {
+                                // Công việc nền, ví dụ: tải bitmap từ URL
+                                CategoryItem ct = categoryList.get(finalI1);
+                                Bitmap bitmap = Utils.getBitmapFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + ct.getIcon());
+                                handler.post(() -> {
+                                    categoryItemArrayList.add(new CategoryItemViewModel(ct.getName(), ct.getIcon(), ct.getId(), bitmap));
+                                    if (finalI1 == (categoryList.size() - 1)) {
+                                        categoryViewModel.setCategories(categoryItemArrayList);
+                                    }
+                                });
+
+                            });
+
+                        }
+                }
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ArrayList<CategoryItem>> call, @NonNull Throwable t) {
+                Toast.makeText(HomePageActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
+            }
+        });
 
     }
 
@@ -335,14 +340,15 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
             apiServices.loginWithAccessToken("Bearer " + accessToken).enqueue(new Callback<LoginResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
-                    if (response.isSuccessful()) {
+                    if (response.isSuccessful() && response.body() != null) {
                         appSharedPreferences.setAllAttribute(response.body().value.userId,
                                 response.body().accessToken, response.body().value.firstName,
                                 response.body().value.avatar);
                         new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + response.body().value.avatar, userImgView, R.drawable.icon_user).execute();
                     } else {
                         Toast.makeText(HomePageActivity.this, "Xác thực thất bại, vui lòng đăng nhập lại ", Toast.LENGTH_SHORT).show();
-                        appSharedPreferences.clear();
+//                        appSharedPreferences.clear();
+                        appSharedPreferences.setIsAuth(false);
                         userImgView.setImageResource(R.drawable.icon_user);
                     }
                     isCheckingAccount = false;
@@ -352,7 +358,8 @@ public class HomePageActivity extends HaveProductSearchApiActivity {
                 @Override
                 public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
                     Toast.makeText(HomePageActivity.this, "Xác thực thất bại, vui lòng đăng nhập lại ", Toast.LENGTH_SHORT).show();
-                    appSharedPreferences.clear();
+//                    appSharedPreferences.clear();
+                    appSharedPreferences.setIsAuth(false);
                     userImgView.setImageResource(R.drawable.icon_user);
                     isCheckingAccount = false;
                 }
