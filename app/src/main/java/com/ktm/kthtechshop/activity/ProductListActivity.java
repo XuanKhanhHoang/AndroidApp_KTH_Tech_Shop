@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -14,6 +15,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.facebook.shimmer.ShimmerFrameLayout;
 import com.ktm.kthtechshop.R;
 import com.ktm.kthtechshop.adapter.Adapter_ProductPreviewRclView;
 import com.ktm.kthtechshop.dto.ProductListResponse;
@@ -40,6 +42,8 @@ public class ProductListActivity extends HaveProductSearchApiActivity {
     private Map<String, String> coreQueryParams;
     private boolean isWaiting = false;
     private ImageButton backBtn;
+    private LinearLayout productList_ProductPreviewShimmerContainer1, productList_ProductPreviewShimmerContainer2;
+    private ShimmerFrameLayout productList_ProductPreviewShimmer1, productList_ProductPreviewShimmer2, productList_ProductPreviewShimmer3, productList_ProductPreviewShimmer4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +56,17 @@ public class ProductListActivity extends HaveProductSearchApiActivity {
         scrollView = findViewById(R.id.scrollView);
         loadingTxtView = findViewById(R.id.loadingText);
         backBtn = findViewById(R.id.backBtn);
+        productList_ProductPreviewShimmerContainer1 = findViewById(R.id.ProductList_ProductPreviewShimmerContainer1);
+        productList_ProductPreviewShimmerContainer2 = findViewById(R.id.ProductList_ProductPreviewShimmerContainer2);
+        productList_ProductPreviewShimmer1 = findViewById(R.id.ProductList_ProductPreviewShimmer1);
+        productList_ProductPreviewShimmer2 = findViewById(R.id.ProductList_ProductPreviewShimmer2);
+        productList_ProductPreviewShimmer3 = findViewById(R.id.ProductList_ProductPreviewShimmer3);
+        productList_ProductPreviewShimmer4 = findViewById(R.id.ProductList_ProductPreviewShimmer4);
+        productList_ProductPreviewShimmer1.startShimmer();
+        productList_ProductPreviewShimmer2.startShimmer();
+        productList_ProductPreviewShimmer3.startShimmer();
+        productList_ProductPreviewShimmer4.startShimmer();
+
         productListRclView.setLayoutManager(new GridLayoutManager(this, 2));
         productListRclView.setHasFixedSize(true);
         productListRclView.setNestedScrollingEnabled(false);
@@ -107,6 +122,12 @@ public class ProductListActivity extends HaveProductSearchApiActivity {
                         findViewById(R.id.no_product_textView).setVisibility(View.VISIBLE);
                     if (pr != null) productList.addAll(pr.data);
                     if (!isWaiting) findViewById(R.id.loadingText).setVisibility(View.GONE);
+                    productList_ProductPreviewShimmer1.stopShimmer();
+                    productList_ProductPreviewShimmer2.stopShimmer();
+                    productList_ProductPreviewShimmer3.stopShimmer();
+                    productList_ProductPreviewShimmer4.stopShimmer();
+                    productList_ProductPreviewShimmerContainer1.setVisibility(View.GONE);
+                    productList_ProductPreviewShimmerContainer2.setVisibility(View.GONE);
                     adapterProductPreviewRclView.notifyDataSetChanged();
                 } else {
                     Toast.makeText(ProductListActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();

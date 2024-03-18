@@ -1,23 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
+    android:orientation="vertical"
     tools:context=".activity.MainActivity">
 
+    <FrameLayout
+        android:id="@+id/MainActivity_FrameContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:nestedScrollingEnabled="false" />
 
-    <ImageView
-        android:id="@+id/logoImage"
-        android:layout_width="314dp"
-        android:layout_height="155dp"
-        android:contentDescription="logo"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/logo_big" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:layout_alignParentBottom="true"
+        android:id="@+id/MainActivity_BottomNavigation"
+        android:layout_width="match_parent"
+        android:layout_height="45dp"
+        android:layout_gravity="bottom"
+        android:padding="0dp"
+        android:layout_margin="0dp"
+        app:itemIconSize="28dp"
+        app:itemPaddingBottom="0dp"
+        app:itemPaddingTop="3dp"
+        android:minHeight="0dp"
+        app:itemTextAppearanceActiveBoldEnabled="false"
+        android:background="@drawable/shape_rectangle_top_gray_line"
+        app:itemActiveIndicatorStyle="@null"
+        app:itemIconTint="@drawable/main_bottom_navigation_bar_color_item"
+        app:itemTextColor="@drawable/main_bottom_navigation_bar_color_item"
+        app:itemBackground="@drawable/main_bottom_navigation_bar_clicking_animation"
+        app:menu="@menu/main_bottom_menu" />
+
+</RelativeLayout>

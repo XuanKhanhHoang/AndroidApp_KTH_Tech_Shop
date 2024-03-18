@@ -62,7 +62,7 @@ public class LoginActivity extends NeededCallApiActivity {
                             editor.putString("firstName", response.body().value.firstName);
                             editor.putBoolean("isAuth", false);
                             editor.apply();
-                            Intent it = new Intent(v.getContext(), HomePageActivity.class);
+                            Intent it = new Intent(v.getContext(), MainActivity.class);
                             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                             v.getContext().startActivity(it);
                         } else if (response.code() == 401) {
