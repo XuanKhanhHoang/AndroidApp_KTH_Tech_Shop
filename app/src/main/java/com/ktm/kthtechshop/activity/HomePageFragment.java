@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -75,7 +76,7 @@ public class HomePageFragment extends Fragment {
     static CategoryViewModel categoryViewModel;
     private RecyclerView categoryRclView, promotionStaticBannerRclView, flashSaleRclView, allProductRclView, smartphoneProductRclView, laptopProductRclView;
 
-    private ArrayList<ProductPreviewItem> flashSaleProductList, allProductArrayList, smartphoneProductList, laptopProductList;
+    static ArrayList<ProductPreviewItem> flashSaleProductList, allProductArrayList, smartphoneProductList, laptopProductList;
     private ImageSlider promotionBannerSlider;
     private AppSharedPreferences appSharedPreferences;
     private ImageView userImgView;
@@ -89,16 +90,66 @@ public class HomePageFragment extends Fragment {
     private LinearLayout shimmerFrameLayoutCategoryContainer;
     protected EditText searchEditText;
 
-    //    private Call<ProductListResponse> callLatestProduct, callLaptopProduct, callSmartPhoneProduct;
+    private Call<ProductListResponse> callLatestProduct, callLaptopProduct, callSmartPhoneProduct;
+    private Call<ArrayList<PromotionBannerItem>> callPromotionBanner;
+    private Call<ArrayList<CategoryItem>> callCategory;
+    private Call<LoginResponse> callCheckingValidUserSession;
 
+    private boolean smartphoneProductIsSet, latestProductIsSet, laptopProductIsSet;
     private Context context;
     private Activity activity;
-    View view;
+    private View view;
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         this.context = context;
+        activity = getActivity();
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        updateUI();
+    }
+
+    public void updateUI() {
+        if (!appSharedPreferences.getAccessToken().isEmpty()) checkValidUserSession();
+        else {
+            userImgView.setImageResource(R.drawable.icon_user);
+            userImgView.setBackgroundColor(Color.TRANSPARENT);
+        }
+        if (!laptopProductIsSet) {
+            handleLaptopProduct();
+        }
+        if (!smartphoneProductIsSet) {
+            handleSmartPhoneProduct();
+        }
+        if (!laptopProductIsSet) {
+            handleLatestProduct();
+        }
+
+    }
+
+    private HomePageFragment() {
+    }
+
+    static HomePageFragment homePageFragment;
+
+    public static HomePageFragment getInstance() {
+        if (homePageFragment != null) {
+            return homePageFragment;
+        } else {
+            homePageFragment = new HomePageFragment();
+            return new HomePageFragment();
+        }
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
     }
 
     @Nullable
@@ -106,14 +157,14 @@ public class HomePageFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = inflater.inflate(R.layout.fragment_home_page, container, false);
-        activity = getActivity();
         appSharedPreferences = new AppSharedPreferences((AppCompatActivity) context);
         apiServiceObject = new ApiServiceObject();
-        //Init Array Lists
-        initLists();
+        latestProductIsSet = false;
+        smartphoneProductIsSet = false;
+        laptopProductIsSet = false;
         //ref child view component
         refChildComponents();
-        //setup rclviews
+        //setup rclViews
         setUpRclViews();
         //Call api
         checkValidUserSession();
@@ -126,8 +177,7 @@ public class HomePageFragment extends Fragment {
             categoryViewModel = new ViewModelProvider((ViewModelStoreOwner) activity).get(CategoryViewModel.class);
         }
         //set callback function on getCategories
-
-        categoryViewModel.getCategories().observe((LifecycleOwner) activity, categories -> {
+        categoryViewModel.getCategories().observe((LifecycleOwner) context, categories -> {
             if (categories != null) {
                 categoryItemArrayList = categories;
                 shimmerFrameLayoutCategoryContainer.setVisibility(View.GONE);
@@ -138,18 +188,18 @@ public class HomePageFragment extends Fragment {
         //is categories  unload
         if (categoryViewModel.getCategories().getValue() == null) {
             // Fetch data from server and set to ViewModel
+            categoryItemArrayList = new ArrayList<>();
+            categoryList = new ArrayList<>();
             handleGetCategoriesFromApi();
         }
-
-
         //Get item
         getPromotionBanner();
         //FlashSale is hardcode now
-        getFlashSaleProduct();
+        SetFlashSaleProduct();
         //Get Product
-        getLatestProduct();
-        getSmartPhoneProduct();
-        getLaptopProduct();
+        handleLatestProduct();
+        handleSmartPhoneProduct();
+        handleLaptopProduct();
         //setup button click listener
         setUpButtonsOnClickListen();
         setUpSearchFunction();
@@ -158,10 +208,14 @@ public class HomePageFragment extends Fragment {
     }
 
     private void handleGetCategoriesFromApi() {
-        apiServiceObject.apiServices.getCategoryList().enqueue(new Callback<ArrayList<CategoryItem>>() {
+        callCategory = apiServiceObject.apiServices.getCategoryList();
+        callCategory.enqueue(new Callback<ArrayList<CategoryItem>>() {
             @Override
             public void onResponse(@NonNull Call<ArrayList<CategoryItem>> call, @NonNull Response<ArrayList<CategoryItem>> response) {
                 if (response.isSuccessful()) {
+                    if (call.isCanceled()) {
+                        return;
+                    }
                     Executor executor = Executors.newSingleThreadExecutor();
                     Handler handler = new Handler(Looper.getMainLooper());
                     categoryItemArrayList.clear();
@@ -189,10 +243,27 @@ public class HomePageFragment extends Fragment {
 
             @Override
             public void onFailure(@NonNull Call<ArrayList<CategoryItem>> call, @NonNull Throwable t) {
-                Toast.makeText(activity, "Call api failed", Toast.LENGTH_SHORT).show();
+                if (call.isCanceled()) {
+                    return;
+                }
+                Toast.makeText(activity, "Có lỗi xảy ra khi tải danh sách loại hàng", Toast.LENGTH_SHORT).show();
             }
         });
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (callCategory == null || callPromotionBanner == null || callLatestProduct == null || callLaptopProduct == null || callSmartPhoneProduct == null)
+            return;
+        callCategory.cancel();
+        callPromotionBanner.cancel();
+        callLaptopProduct.cancel();
+        callLatestProduct.cancel();
+        callSmartPhoneProduct.cancel();
+        if (callCheckingValidUserSession == null) return;
+        callCheckingValidUserSession.cancel();
     }
 
     protected void refChildComponents() {
@@ -216,15 +287,8 @@ public class HomePageFragment extends Fragment {
         shimmerFrameLayoutCategoryContainer = view.findViewById(R.id.HomePage_ShimmerCategory_Container);
     }
 
-    protected void initLists() {
 
-        categoryItemArrayList = new ArrayList<>();
-        flashSaleProductList = new ArrayList<>();
-        allProductArrayList = new ArrayList<>();
-        categoryList = new ArrayList<>();
-    }
-
-    protected void setUpSearchFunction() {
+    private void setUpSearchFunction() {
         if (searchEditText == null) return;
         searchEditText.setSingleLine();
         searchEditText.setImeActionLabel("Done", KeyEvent.KEYCODE_ENTER);
@@ -243,7 +307,7 @@ public class HomePageFragment extends Fragment {
         });
     }
 
-    protected void setUpRclViews() {
+    private void setUpRclViews() {
         FlexboxLayoutManager flexboxLayoutManager = new FlexboxLayoutManager(context);
         flexboxLayoutManager.setFlexDirection(FlexDirection.ROW);
         flexboxLayoutManager.setFlexWrap(FlexWrap.WRAP);
@@ -264,17 +328,22 @@ public class HomePageFragment extends Fragment {
 
     private void getPromotionBanner() {
         if (promotionBannerSlideItems == null && promotionStaticBannerList == null) {
-            promotionBannerSlideItems = new ArrayList<>();
-            promotionStaticBannerList = new ArrayList<>();
             ArrayList<SlideModel> tmp = new ArrayList<SlideModel>();
             tmp.add(new SlideModel(R.drawable.img_loading_text, ScaleTypes.CENTER_INSIDE));
             promotionBannerSlider.setImageList(tmp);
-            apiServiceObject.apiServices.getListPromotionBanner().enqueue(new Callback<ArrayList<PromotionBannerItem>>() {
+            callPromotionBanner = apiServiceObject.apiServices.getListPromotionBanner();
+            callPromotionBanner.enqueue(new Callback<ArrayList<PromotionBannerItem>>() {
                 @Override
                 public void onResponse(@NonNull Call<ArrayList<PromotionBannerItem>> call, @NonNull Response<ArrayList<PromotionBannerItem>> response) {
+                    if (call.isCanceled()) {
+                        return;
+                    }
                     if (response.isSuccessful()) {
                         ArrayList<PromotionBannerItem> tmp = response.body();
                         //Split to static banner and carousel banner
+                        promotionBannerSlideItems = new ArrayList<>();
+                        promotionStaticBannerList = new ArrayList<>();
+
                         if (tmp != null && tmp.size() > 0) {
                             for (PromotionBannerItem item : tmp) {
                                 item.setImage(localhostIp.LOCALHOST_IP.getValue() + ":3000" + item.getImage());
@@ -299,8 +368,11 @@ public class HomePageFragment extends Fragment {
 
                 @Override
                 public void onFailure(@NonNull Call<ArrayList<PromotionBannerItem>> call, @NonNull Throwable t) {
+                    if (call.isCanceled()) {
+                        return;
+                    }
                     promotionStaticBannerRclView.setVisibility(View.GONE);
-                    Toast.makeText(activity, "Call api failed", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "Có lỗi xảy ra khi tải danh sách khuyến mại", Toast.LENGTH_SHORT).show();
                 }
             });
 
@@ -313,98 +385,169 @@ public class HomePageFragment extends Fragment {
 
     }
 
-    private void getFlashSaleProduct() {
-        float rating = 3.4f;
-        Integer productId = 1;
-        flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 ", 20000000, 20000000, productId, rating));
-        flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 ", 20000000, 20000000, productId, rating));
-        flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 abc  ", 3000000, 200000, 20, productId, rating));
-        flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 abc", 3000000, 200000, 20, productId, rating));
+    private void SetFlashSaleProduct() {
+        if (flashSaleProductList == null) {
+            flashSaleProductList = new ArrayList<>();
+            float rating = 3.4f;
+            Integer productId = 1;
+            flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 ", 20000000, 20000000, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 ", 20000000, 20000000, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 abc  ", 3000000, 200000, 20, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 abc", 3000000, 200000, 20, productId, rating));
+        }
         flashSaleRclView.setAdapter(new Adapter_FlashSalePreviewRclView(context, flashSaleProductList));
 
+
     }
 
-    private void getLatestProduct() {
-        Map<String, String> mp = new HashMap<String, String>();
-        mp.put("product_per_page", "6");
-        apiServiceObject.apiServices.getProductList(mp).enqueue(new Callback<ProductListResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<ProductListResponse> call, @NonNull Response<ProductListResponse> response) {
-                if (response.isSuccessful()) {
-                    ProductListResponse pr = (ProductListResponse) (response.body());
-                    if (pr != null && pr.totalPage > 0)
-                        view.findViewById(R.id.allProductNoProduct_textView).setVisibility(View.INVISIBLE);
-                    assert pr != null;
-                    allProductArrayList = pr.data;
-                    allProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, allProductArrayList));
-                } else {
-                    Toast.makeText(activity, "Something Wrong", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ProductListResponse> call, @NonNull Throwable t) {
-                Toast.makeText(activity, "Call api failed", Toast.LENGTH_SHORT).show();
-            }
+    private void handleLatestProduct() {
+        latestProductBtnMore.setOnClickListener((v) -> {
+            Intent it = new Intent(v.getContext(), ProductListActivity.class);
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            v.getContext().startActivity(it);
         });
+        if (allProductArrayList == null) {
+            Map<String, String> mp = new HashMap<String, String>();
+            mp.put("product_per_page", "6");
+            callLatestProduct = apiServiceObject.apiServices.getProductList(mp);
+            callLatestProduct.enqueue(new Callback<ProductListResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<ProductListResponse> call, @NonNull Response<ProductListResponse> response) {
+                    if (response.isSuccessful()) {
+                        if (call.isCanceled()) {
+                            return;
+                        }
+                        ProductListResponse pr = response.body();
+                        if (pr != null && pr.totalPage > 0)
+                            view.findViewById(R.id.allProductNoProduct_textView).setVisibility(View.INVISIBLE);
+                        assert pr != null;
+                        allProductArrayList = pr.data;
+                        latestProductIsSet = true;
+                        allProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, allProductArrayList));
+                    } else {
+                        Toast.makeText(activity, "Something Wrong", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<ProductListResponse> call, @NonNull Throwable t) {
+                    if (call.isCanceled()) {
+                        return;
+                    }
+                    Toast.makeText(activity, "Có lỗi xảy ra khi tải danh sách sản phẩm mới", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            if (allProductArrayList.size() > 0)
+                view.findViewById(R.id.allProductNoProduct_textView).setVisibility(View.INVISIBLE);
+            allProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, allProductArrayList));
+        }
     }
 
-    private void getSmartPhoneProduct() {
-        Map<String, String> mp1 = new HashMap<String, String>();
-        mp1.put("category_id", "1");
-        apiServiceObject.apiServices.getProductList(mp1).enqueue(new Callback<ProductListResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<ProductListResponse> call, @NonNull Response<ProductListResponse> response) {
-                if (response.isSuccessful()) {
-                    ProductListResponse pr = (ProductListResponse) (response.body());
-                    if (pr != null && pr.totalPage > 0)
-                        view.findViewById(R.id.smartphoneListNoProduct_textView).setVisibility(View.INVISIBLE);
-                    assert pr != null;
-                    smartphoneProductList = pr.data;
-                    smartphoneProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, smartphoneProductList));
-                } else {
-                    Toast.makeText(activity, "Something Wrong", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ProductListResponse> call, @NonNull Throwable t) {
-                Toast.makeText(activity, "Call api failed", Toast.LENGTH_SHORT).show();
-            }
+    private void handleSmartPhoneProduct() {
+        smartPhoneBtnMore.setOnClickListener((v) -> {
+            Intent it = new Intent(v.getContext(), ProductListActivity.class);
+            Map<String, String> mp = new HashMap<String, String>();
+            mp.put("category_id", smartphoneCategoryId.toString());
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            it.putExtra("queryParams", (Serializable) mp);
+            v.getContext().startActivity(it);
         });
+        if (smartphoneProductList == null) {
+            Map<String, String> mp1 = new HashMap<String, String>();
+            mp1.put("category_id", "1");
+            callSmartPhoneProduct = apiServiceObject.apiServices.getProductList(mp1);
+            callSmartPhoneProduct.enqueue(new Callback<ProductListResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<ProductListResponse> call, @NonNull Response<ProductListResponse> response) {
+                    if (response.isSuccessful()) {
+                        if (call.isCanceled()) {
+                            return;
+                        }
+                        ProductListResponse pr = (ProductListResponse) (response.body());
+                        if (pr != null && pr.totalPage > 0)
+                            view.findViewById(R.id.smartphoneListNoProduct_textView).setVisibility(View.INVISIBLE);
+                        assert pr != null;
+                        smartphoneProductIsSet = true;
+                        smartphoneProductList = pr.data;
+                        smartphoneProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, smartphoneProductList));
+                    } else {
+                        Toast.makeText(activity, "Something Wrong", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<ProductListResponse> call, @NonNull Throwable t) {
+                    if (call.isCanceled()) {
+                        return;
+                    }
+                    Toast.makeText(activity, "Có lỗi xảy ra khi tải danh sách sản phẩm điện thoại", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            if (smartphoneProductList.size() > 0)
+                view.findViewById(R.id.smartphoneListNoProduct_textView).setVisibility(View.INVISIBLE);
+            smartphoneProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, smartphoneProductList));
+        }
     }
 
-    private void getLaptopProduct() {
-        Map<String, String> mp2 = new HashMap<String, String>();
-        mp2.put("category_id", "2");
-        apiServiceObject.apiServices.getProductList(mp2).enqueue(new Callback<ProductListResponse>() {
-            @Override
-            public void onResponse(@NonNull Call<ProductListResponse> call, @NonNull Response<ProductListResponse> response) {
-                if (response.isSuccessful()) {
-                    ProductListResponse pr = (ProductListResponse) (response.body());
-                    if (pr != null && pr.totalPage > 0)
-                        view.findViewById(R.id.laptop_no_product_textView).setVisibility(View.INVISIBLE);
-                    assert pr != null;
-                    laptopProductList = pr.data;
-                    laptopProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, laptopProductList));
-                } else {
-                    Toast.makeText(activity, "Something Wrong", Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ProductListResponse> call, @NonNull Throwable t) {
-                Toast.makeText(activity, "Call api failed", Toast.LENGTH_SHORT).show();
-            }
+    private void handleLaptopProduct() {
+        laptopBtnMore.setOnClickListener((v) -> {
+            Intent it = new Intent(v.getContext(), ProductListActivity.class);
+            Map<String, String> mp = new HashMap<String, String>();
+            mp.put("category_id", laptopCategoryId.toString());
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            it.putExtra("queryParams", (Serializable) mp);
+            v.getContext().startActivity(it);
         });
+        if (laptopProductList == null) {
+            Map<String, String> mp2 = new HashMap<String, String>();
+            mp2.put("category_id", "2");
+            callLaptopProduct = apiServiceObject.apiServices.getProductList(mp2);
+            callLaptopProduct.enqueue(new Callback<ProductListResponse>() {
+                @Override
+                public void onResponse(@NonNull Call<ProductListResponse> call, @NonNull Response<ProductListResponse> response) {
+                    if (response.isSuccessful()) {
+                        if (call.isCanceled()) {
+                            return;
+                        }
+                        laptopProductIsSet = true;
+                        ProductListResponse pr = (ProductListResponse) (response.body());
+                        if (pr != null && pr.totalPage > 0)
+                            view.findViewById(R.id.laptop_no_product_textView).setVisibility(View.INVISIBLE);
+                        assert pr != null;
+                        laptopProductList = pr.data;
+                        laptopProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, laptopProductList));
+                    } else {
+                        Toast.makeText(activity, "Something Wrong", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<ProductListResponse> call, @NonNull Throwable t) {
+                    if (call.isCanceled()) {
+                        return;
+                    }
+                    Toast.makeText(activity, "Có lỗi xảy ra khi tải danh sách sản phẩm laptop", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            if (laptopProductList.size() > 0)
+                view.findViewById(R.id.laptop_no_product_textView).setVisibility(View.INVISIBLE);
+            laptopProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, laptopProductList));
+        }
     }
 
     private void checkValidUserSession() {
         String accessToken = appSharedPreferences.getAccessToken();
         if (!accessToken.isEmpty() || appSharedPreferences.getIsAuth()) {
-            apiServiceObject.apiServices.loginWithAccessToken("Bearer " + accessToken).enqueue(new Callback<LoginResponse>() {
+            callCheckingValidUserSession = apiServiceObject.apiServices.loginWithAccessToken("Bearer " + accessToken);
+            callCheckingValidUserSession.enqueue(new Callback<LoginResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<LoginResponse> call, @NonNull Response<LoginResponse> response) {
+                    if (call.isCanceled()) {
+                        return;
+                    }
                     if (response.isSuccessful() && response.body() != null) {
                         appSharedPreferences.setAllAttribute(response.body().value.userId,
                                 response.body().accessToken, response.body().value.firstName,
@@ -415,6 +558,7 @@ public class HomePageFragment extends Fragment {
 //                        appSharedPreferences.clear();
                         appSharedPreferences.setIsAuth(false);
                         userImgView.setImageResource(R.drawable.icon_user);
+                        userImgView.setBackgroundColor(Color.TRANSPARENT);
                     }
                     isCheckingAccount = false;
 
@@ -422,6 +566,9 @@ public class HomePageFragment extends Fragment {
 
                 @Override
                 public void onFailure(@NonNull Call<LoginResponse> call, @NonNull Throwable t) {
+                    if (call.isCanceled()) {
+                        return;
+                    }
                     Toast.makeText(activity, "Xác thực thất bại, vui lòng đăng nhập lại ", Toast.LENGTH_SHORT).show();
 //                    appSharedPreferences.clear();
                     appSharedPreferences.setIsAuth(false);
@@ -445,50 +592,12 @@ public class HomePageFragment extends Fragment {
                 }
             }
         });
-        userImgView.setOnClickListener(v -> {
-            if (!isCheckingAccount) {
-                if (!appSharedPreferences.getIsAuth() || appSharedPreferences.getAccessToken().isEmpty()) {
-                    Intent it = new Intent(v.getContext(), LoginActivity.class);
-                    it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    v.getContext().startActivity(it);
-                } else {
-                    //to user activity
-                }
-            }
-        });
 
         ImageButton cartBtn = view.findViewById(R.id.HomePage_CartBtn);
         cartBtn.setOnClickListener(v -> {
             Intent it = new Intent(activity, CartActivity.class);
             it.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             activity.startActivity(it);
-        });
-
-        latestProductBtnMore.setOnClickListener((v) -> {
-            Intent it = new Intent(v.getContext(), ProductListActivity.class);
-            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            v.getContext().startActivity(it);
-        });
-        smartPhoneBtnMore.setOnClickListener((v) -> {
-            Intent it = new Intent(v.getContext(), ProductListActivity.class);
-            Map<String, String> mp = new HashMap<String, String>();
-            mp.put("category_id", smartphoneCategoryId.toString());
-            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            it.putExtra("queryParams", (Serializable) mp);
-            v.getContext().startActivity(it);
-        });
-        laptopBtnMore.setOnClickListener((v) -> {
-            Intent it = new Intent(v.getContext(), ProductListActivity.class);
-            Map<String, String> mp = new HashMap<String, String>();
-            mp.put("category_id", laptopCategoryId.toString());
-            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            it.putExtra("queryParams", (Serializable) mp);
-            v.getContext().startActivity(it);
-        });
-        latestProductBtnMore.setOnClickListener((v) -> {
-            Intent it = new Intent(v.getContext(), ProductListActivity.class);
-            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            v.getContext().startActivity(it);
         });
     }
 }

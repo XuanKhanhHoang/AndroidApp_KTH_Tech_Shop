@@ -5,11 +5,11 @@
         android:icon="@drawable/ic_house_solid"
         android:title="Màn hình chính" />
     <item
-        android:id="@+id/MainBottomMenu_Notify"
+        android:id="@+id/MainBottomMenu_ToNotify"
         android:icon="@drawable/ic_bell_regular"
         android:title="Thông báo" />
     <item
-        android:id="@+id/MainBottomMenu_AccountPage"
+        android:id="@+id/MainBottomMenu_ToAccountPage"
         android:icon="@drawable/ic_user_solid"
         android:title="Tài Khoản" />
 </menu>

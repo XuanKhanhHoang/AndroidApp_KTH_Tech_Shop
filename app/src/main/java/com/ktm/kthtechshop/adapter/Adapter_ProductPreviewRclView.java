@@ -66,7 +66,7 @@ public class Adapter_ProductPreviewRclView extends RecyclerView.Adapter<ViewHold
                 v.getContext().startActivity(it);
             }
         });
-        new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + item.getLogo(), holder.logo).execute();
+        new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + item.getLogo(), holder.logo, R.drawable.img_image_broke).execute();
         holder.ratingBar.setRating(item.getRating());
     }
 

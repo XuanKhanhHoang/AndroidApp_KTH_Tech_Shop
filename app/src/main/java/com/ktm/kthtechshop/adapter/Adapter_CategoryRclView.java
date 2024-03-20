@@ -45,16 +45,13 @@ public class Adapter_CategoryRclView extends RecyclerView.Adapter<ViewHolder_Cat
         if (!ct.getId().equals("-1"))
             holder.categoryLogo.setImageBitmap(ct.imageBitmap);
         else holder.categoryLogo.setImageResource(R.drawable.img_loading_text);
-        holder.categoryLogo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent it = new Intent(v.getContext(), ProductListActivity.class);
-                Map<String, String> mp = new HashMap<String, String>();
-                mp.put("category_id", ct.getId());
-                it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                it.putExtra("queryParams", (Serializable) mp);
-                v.getContext().startActivity(it);
-            }
+        holder.categoryLogo.setOnClickListener(v -> {
+            Intent it = new Intent(v.getContext(), ProductListActivity.class);
+            Map<String, String> mp = new HashMap<String, String>();
+            mp.put("category_id", ct.getId());
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            it.putExtra("queryParams", (Serializable) mp);
+            v.getContext().startActivity(it);
         });
     }
 
