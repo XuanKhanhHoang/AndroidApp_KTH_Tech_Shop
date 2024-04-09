@@ -79,23 +79,16 @@
                     android:background="@drawable/ic_cart_solid"
                     android:backgroundTint="@android:color/white" />
 
-                <androidx.cardview.widget.CardView
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/HomePage_UserIcon_imgView"
                     android:layout_width="40dp"
                     android:layout_height="40dp"
-                    android:padding="0dp"
-                    app:cardCornerRadius="99dp">
-
-                    <ImageView
-                        android:id="@+id/HomePage_UserIcon_imgView"
-                        android:layout_width="40dp"
-                        android:layout_height="40dp"
-                        android:background="@color/main"
-                        android:contentDescription="TODO"
-                        android:paddingVertical="5dp"
-                        android:layout_gravity="center"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/icon_user" />
-                </androidx.cardview.widget.CardView>
+                    app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
+                    app:strokeColor="@color/main"
+                    android:src="@drawable/icon_user"
+                    android:background="@color/main"
+                    app:strokeWidth="0dp" />
 
             </LinearLayout>
 
@@ -500,7 +493,7 @@
             app:layout_constraintTop_toBottomOf="@+id/smartphoneHeader" />
 
         <RelativeLayout
-            android:id="@+id/LaptopHeader"
+            android:id="@+id/TabletHeader"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
@@ -511,7 +504,7 @@
             app:layout_constraintTop_toBottomOf="@+id/smartphone_rclview">
 
             <TextView
-                android:id="@+id/LaptopHeaderTitle"
+                android:id="@+id/TabletHeaderTitle"
                 android:layout_width="226dp"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
@@ -520,7 +513,7 @@
                 android:backgroundTint="#FF00483D"
                 android:gravity="center"
                 android:paddingEnd="10dp"
-                android:text="Laptop"
+                android:text="Máy Tính Bảng"
                 android:textAlignment="center"
                 android:textColor="#FFFFFF"
                 android:textSize="16sp"
@@ -528,7 +521,7 @@
                 app:drawableStartCompat="@drawable/category_title_drawable" />
 
             <Button
-                android:id="@+id/HomPage_Btn_LaptopHeader_more"
+                android:id="@+id/HomPage_Btn_TabletHeader_more"
                 style="@style/Widget.Material3.Button"
                 android:layout_width="113dp"
                 android:layout_height="match_parent"
@@ -547,7 +540,7 @@
         </RelativeLayout>
 
         <TextView
-            android:id="@+id/laptop_no_product_textView"
+            android:id="@+id/Tablet_no_product_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingVertical="5dp"
@@ -556,17 +549,17 @@
             android:visibility="visible"
             app:layout_constraintEnd_toStartOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/LaptopHeader" />
+            app:layout_constraintTop_toBottomOf="@id/TabletHeader" />
 
         <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/laptop_rclview"
+            android:id="@+id/Tablet_rclview"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="15dp"
             android:nestedScrollingEnabled="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/LaptopHeader" />
+            app:layout_constraintTop_toBottomOf="@+id/TabletHeader" />
 
         <RelativeLayout
             android:id="@+id/allProductListHeader"
@@ -577,7 +570,7 @@
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/laptop_rclview">
+            app:layout_constraintTop_toBottomOf="@+id/Tablet_rclview">
 
             <TextView
                 android:id="@+id/allProductListHeaderTitle"

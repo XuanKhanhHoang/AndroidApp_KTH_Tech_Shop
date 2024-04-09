@@ -1,13 +1,16 @@
 package com.ktm.kthtechshop.activity;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.graphics.Paint;
 import android.os.Bundle;
 import android.text.InputFilter;
 import android.text.Spanned;
 import android.view.View;
+import android.webkit.WebView;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.RatingBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,25 +28,26 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
 import com.ktm.kthtechshop.AppSharedPreferences;
 import com.ktm.kthtechshop.R;
+import com.ktm.kthtechshop.adapter.Adapter_ProductDetail_ProductComment;
 import com.ktm.kthtechshop.adapter.Adapter_ProductDetail_ProductOptionRclView;
 import com.ktm.kthtechshop.dto.AddCartSendToServer;
 import com.ktm.kthtechshop.dto.AddOptionToCartResponse;
 import com.ktm.kthtechshop.dto.CartItemSaved;
 import com.ktm.kthtechshop.dto.ProductDetail;
 import com.ktm.kthtechshop.dto.ProductOption;
-import com.ktm.kthtechshop.localhostIp;
 import com.ktm.kthtechshop.others.ProductDetail_ProductOption_ClickListener;
 import com.ktm.kthtechshop.utils.Utils;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Objects;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
 public class ProductDetailActivity extends NeededCallApiActivity implements ProductDetail_ProductOption_ClickListener {
-    private TextView productName_txtView, ratingNumber_txtView, sellingPrice_txtView, originalPrice_txtView, totalCost_txtView;
+    private TextView productName_txtView, ratingNumber_txtView, sellingPrice_txtView, originalPrice_txtView, totalCost_txtView, noComment_txtView;
     private RatingBar ratingBar;
     private ImageSlider slider;
     private Button increaseAmount_btn, decreaseAmount_btn, addToCart_btn, buyNow_btn;
@@ -56,6 +60,9 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
     private Integer productId;
     private ImageButton backBtn, toCartBtn;
     private AppSharedPreferences appSharedPreferences;
+    private WebView specWebView, descriptionWebView;
+    private RecyclerView commentRclView;
+    private ImageView noComment_imgView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,82 +78,13 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
         if (it != null) {
             productId = it.getIntExtra("productId", -1);
         }
-        if (productId != -1)
-            apiServices.getProductDetail(productId).enqueue(new Callback<ProductDetail>() {
-                @Override
-                public void onResponse(@NonNull Call<ProductDetail> call, @NonNull Response<ProductDetail> response) {
-                    if (response.isSuccessful()) {
-                        product = response.body();
-                        ratingBar.setRating(product.rating);
-                        ratingBar.setStepSize(0.1f);
-                        ratingBar.setIsIndicator(true);
-                        totalCost = product.productOptions.get(0).sellingPrice;
-                        option_rclView.setAdapter(new Adapter_ProductDetail_ProductOptionRclView(ProductDetailActivity.this, product.productOptions, ProductDetailActivity.this));
-                        ArrayList<SlideModel> sr = new ArrayList<>();
-                        sr.add(new SlideModel(product.logo, ScaleTypes.CENTER_INSIDE));
-                        for (ProductOption option : product.productOptions
-                        ) {
-                            if (option.image != null && option.image.length() != 0) {
-                                sr.add(new SlideModel(localhostIp.LOCALHOST_IP.getValue() + ":3000" + option.image, ScaleTypes.CENTER_INSIDE));
-                            }
-                        }
-                        slider.setImageList(sr);
-                        notifyCurrOptionChange();
-
-                    } else {
-                        Toast.makeText(ProductDetailActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
-                        findViewById(R.id.ProductDetail_MainContent).setVisibility(View.GONE);
-                        findViewById(R.id.ProductDetail_ErrorText).setVisibility(View.VISIBLE);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<ProductDetail> call, Throwable t) {
-                    Toast.makeText(ProductDetailActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
-                    findViewById(R.id.ProductDetail_MainContent).setVisibility(View.GONE);
-                    findViewById(R.id.ProductDetail_ErrorText).setVisibility(View.VISIBLE);
-                }
-            });
-        else {
-            Toast.makeText(ProductDetailActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
-            findViewById(R.id.ProductDetail_MainContent).setVisibility(View.GONE);
-            findViewById(R.id.ProductDetail_ErrorText).setVisibility(View.VISIBLE);
-        }
-
-        limitTextInputEditText(amount_editTxtView);
-        option_rclView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
-        option_rclView.setHasFixedSize(true);
-
-
-        increaseAmount_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (curAmount < product.productOptions.get(curPositionOption).amount) {
-                    curAmount++;
-                    isFilterAmountInput = false;
-                    amount_editTxtView.setText(String.valueOf(curAmount));
-                    isFilterAmountInput = true;
-                }
-            }
-        });
-        decreaseAmount_btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (curAmount > 1) {
-                    curAmount--;
-                    isFilterAmountInput = false;
-                    amount_editTxtView.setText(String.valueOf(curAmount));
-                    isFilterAmountInput = true;
-                }
-            }
-        });
         backBtn.setOnClickListener(v -> {
             finish();
         });
         toCartBtn.setOnClickListener(v -> {
             //to cart act
-
-
+            Intent intent = new Intent(ProductDetailActivity.this, CartActivity.class);
+            ProductDetailActivity.this.startActivity(intent);
         });
         addToCart_btn.setOnClickListener(v -> {
             if (!appSharedPreferences.getIsAuth()) {
@@ -174,8 +112,9 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
             } else cart = new ArrayList<>();
             apiServices.addOptionToCart(appSharedPreferences.getBearerAccessToken(), new AddCartSendToServer(optionId)).enqueue(new Callback<AddOptionToCartResponse>() {
                 @Override
-                public void onResponse(Call<AddOptionToCartResponse> call, Response<AddOptionToCartResponse> response) {
+                public void onResponse(@NonNull Call<AddOptionToCartResponse> call, @NonNull Response<AddOptionToCartResponse> response) {
                     if (response.isSuccessful()) {
+                        assert response.body() != null;
                         cart.add(new CartItemSaved(response.body().cartId, optionId, curAmount));
                         appSharedPreferences.setCart(gson.toJson(cart));
                         Toast.makeText(ProductDetailActivity.this, "Thêm vào giỏ hàng thành công !", Toast.LENGTH_SHORT).show();
@@ -186,11 +125,89 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
                 }
 
                 @Override
-                public void onFailure(Call<AddOptionToCartResponse> call, Throwable t) {
+                public void onFailure(@NonNull Call<AddOptionToCartResponse> call, @NonNull Throwable t) {
                     Toast.makeText(ProductDetailActivity.this, "Thêm vào giỏ hàng Thất bại !", Toast.LENGTH_SHORT).show();
                 }
             });
         });
+        if (productId != -1)
+            apiServices.getProductDetail(productId).enqueue(new Callback<ProductDetail>() {
+                @Override
+                public void onResponse(@NonNull Call<ProductDetail> call, @NonNull Response<ProductDetail> response) {
+                    if (response.isSuccessful()) {
+                        product = response.body();
+                        assert product != null;
+                        ratingBar.setRating(product.rating);
+                        ratingBar.setStepSize(0.1f);
+                        ratingBar.setIsIndicator(true);
+                        totalCost = product.productOptions.get(0).sellingPrice;
+                        option_rclView.setAdapter(new Adapter_ProductDetail_ProductOptionRclView(ProductDetailActivity.this, product.productOptions, ProductDetailActivity.this));
+                        ArrayList<SlideModel> sr = new ArrayList<>();
+                        sr.add(new SlideModel(product.logo, ScaleTypes.CENTER_INSIDE));
+                        for (ProductOption option : product.productOptions
+                        ) {
+                            if (option.image != null && option.image.length() != 0) {
+                                sr.add(new SlideModel(option.image, ScaleTypes.CENTER_INSIDE));
+                            }
+                        }
+                        slider.setImageList(sr);
+                        if (product.comment.size() > 0) {
+                            noComment_imgView.setVisibility(View.GONE);
+                            noComment_txtView.setVisibility(View.GONE);
+                            commentRclView.setLayoutManager(new LinearLayoutManager(ProductDetailActivity.this, LinearLayoutManager.VERTICAL, false));
+                            commentRclView.setAdapter(new Adapter_ProductDetail_ProductComment(ProductDetailActivity.this, product.comment));
+
+                        }
+                        String desHtml = "<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"htmlCss.css\"></head><body>" + product.description + "</body></html>";
+                        String specHtml = "<html><head><link rel=\"stylesheet\" type=\"text/css\" href=\"htmlCss.css\"></head><body>" + product.information + "</body></html>";
+                        specWebView.loadDataWithBaseURL("file:///android_asset/", specHtml, "text/html", "UTF-8", null);
+                        descriptionWebView.loadDataWithBaseURL(null, desHtml, "text/html", "UTF-8", null);
+                        notifyCurrOptionChange();
+
+                    } else {
+                        Toast.makeText(ProductDetailActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
+                        findViewById(R.id.ProductDetail_MainContent).setVisibility(View.GONE);
+                        findViewById(R.id.ProductDetail_ErrorText).setVisibility(View.VISIBLE);
+                    }
+                }
+
+                @Override
+                public void onFailure(@NonNull Call<ProductDetail> call, @NonNull Throwable t) {
+                    Toast.makeText(ProductDetailActivity.this, "Call api failed", Toast.LENGTH_SHORT).show();
+                    findViewById(R.id.ProductDetail_MainContent).setVisibility(View.GONE);
+                    findViewById(R.id.ProductDetail_ErrorText).setVisibility(View.VISIBLE);
+                }
+            });
+        else {
+            Toast.makeText(ProductDetailActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
+            findViewById(R.id.ProductDetail_MainContent).setVisibility(View.GONE);
+            findViewById(R.id.ProductDetail_ErrorText).setVisibility(View.VISIBLE);
+            return;
+        }
+
+
+        limitTextInputEditText(amount_editTxtView);
+        option_rclView.setLayoutManager(new LinearLayoutManager(this, RecyclerView.VERTICAL, false));
+        option_rclView.setHasFixedSize(true);
+
+
+        increaseAmount_btn.setOnClickListener(v -> {
+            if (curAmount < product.productOptions.get(curPositionOption).amount) {
+                curAmount++;
+                isFilterAmountInput = false;
+                amount_editTxtView.setText(String.valueOf(curAmount));
+                isFilterAmountInput = true;
+            }
+        });
+        decreaseAmount_btn.setOnClickListener(v -> {
+            if (curAmount > 1) {
+                curAmount--;
+                isFilterAmountInput = false;
+                amount_editTxtView.setText(String.valueOf(curAmount));
+                isFilterAmountInput = true;
+            }
+        });
+
     }
 
     private void refChildComponents() {
@@ -209,6 +226,11 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
         amount_editTxtView = findViewById(R.id.ProductDetail_amountInp);
         backBtn = findViewById(R.id.backBtn);
         toCartBtn = findViewById(R.id.ToCart);
+        specWebView = findViewById(R.id.ProductDetail_Spec_WebView);
+        descriptionWebView = findViewById(R.id.ProductDetail_Description_WebView);
+        commentRclView = findViewById(R.id.ProductDetail_Comment_RclView);
+        noComment_txtView = findViewById(R.id.ProductDetail_NoComment_TxtView);
+        noComment_imgView = findViewById(R.id.ProductDetail_NoCommentImg);
     }
 
     private void limitTextInputEditText(TextInputEditText editText) {
@@ -222,29 +244,29 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
                 }
                 try {
                     int upperBound = product.productOptions.get(curPositionOption).amount;
-                    Integer input = Integer.parseInt(source.toString());
+                    int input = Integer.parseInt(source.toString());
                     if (source.length() == 0) {
                         curAmount = input;
                         notifyTotalCostChange();
                         return null;
                     }
                     if (input >= 0) {
-                        if (editText.getText().length() == 0 && input < upperBound && input > 0) {
+                        if (Objects.requireNonNull(editText.getText()).length() == 0 && input < upperBound && input > 0) {
                             curAmount = input;
                             notifyTotalCostChange();
                             return null;
                         }
                         try {
-                            Integer nextVal = Integer.parseInt(editText.getText().toString() + input.toString());
+                            int nextVal = Integer.parseInt(editText.getText().toString() + Integer.toString(input));
                             if (nextVal > 0 && nextVal <= upperBound) {
                                 curAmount = nextVal;
                                 notifyTotalCostChange();
                                 return null;
                             }
-                        } catch (NumberFormatException e) {
+                        } catch (NumberFormatException ignored) {
                         }
                     }
-                } catch (NumberFormatException e) {
+                } catch (NumberFormatException ignored) {
                 }
                 return "";
             }
@@ -252,6 +274,7 @@ public class ProductDetailActivity extends NeededCallApiActivity implements Prod
         editText.setFilters(new InputFilter[]{inputFilter});
     }
 
+    @SuppressLint("SetTextI18n")
     private void notifyCurrOptionChange() {
         productName_txtView.setText(product.name);
         ratingNumber_txtView.setText(Float.toString(product.rating));

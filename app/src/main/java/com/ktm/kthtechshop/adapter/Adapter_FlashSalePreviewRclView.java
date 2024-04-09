@@ -1,5 +1,6 @@
 package com.ktm.kthtechshop.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Paint;
 import android.view.LayoutInflater;
@@ -32,6 +33,7 @@ public class Adapter_FlashSalePreviewRclView extends RecyclerView.Adapter<ViewHo
 
     }
 
+    @SuppressLint({"DefaultLocale", "SetTextI18n"})
     @Override
     public void onBindViewHolder(@NonNull ViewHolder_ProductPreviewRclView holder, int position) {
         holder.productName.setText(newProductItemArrayList.get(position).getName());
@@ -51,21 +53,7 @@ public class Adapter_FlashSalePreviewRclView extends RecyclerView.Adapter<ViewHo
 
     @Override
     public int getItemCount() {
-        return Math.min(newProductItemArrayList.size(), 6);
+        return newProductItemArrayList.size();
     }
 }
 
-//class ViewHolder_ProductPreviewRclView extends RecyclerView.ViewHolder {
-//    ImageView logo;
-//    TextView discount, productName, originalPrice, sellingPrice;
-//
-//    public ViewHolder_ProductPreviewRclView(@NonNull View itemView) {
-//        super(itemView);
-//        logo = itemView.findViewById(R.id.logoImage);
-//        discount = itemView.findViewById(R.id.discount);
-//        productName = itemView.findViewById(R.id.productName);
-//        originalPrice = itemView.findViewById(R.id.productOriginalPrice);
-//        sellingPrice = itemView.findViewById(R.id.productSellingPrice);
-//
-//    }
-//}

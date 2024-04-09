@@ -1,8 +1,12 @@
 package com.ktm.kthtechshop.adapter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Paint;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,19 +20,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.ktm.kthtechshop.R;
 import com.ktm.kthtechshop.activity.ProductDetailActivity;
-import com.ktm.kthtechshop.dto.ProductPreviewItem;
-import com.ktm.kthtechshop.localhostIp;
-import com.ktm.kthtechshop.utils.ImageLoadFromURL;
+import com.ktm.kthtechshop.model.ProductPreview;
 import com.ktm.kthtechshop.utils.Utils;
 
 import java.util.ArrayList;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 public class Adapter_ProductPreviewRclView extends RecyclerView.Adapter<ViewHolder_ProductPreviewRclView> {
 
     Context context;
-    ArrayList<ProductPreviewItem> newProductItemArrayList;
+    ArrayList<ProductPreview> newProductItemArrayList;
 
-    public Adapter_ProductPreviewRclView(Context context, ArrayList<ProductPreviewItem> newProductItemArrayList) {
+    public Adapter_ProductPreviewRclView(Context context, ArrayList<ProductPreview> newProductItemArrayList) {
         this.context = context;
         this.newProductItemArrayList = newProductItemArrayList;
     }
@@ -41,10 +45,11 @@ public class Adapter_ProductPreviewRclView extends RecyclerView.Adapter<ViewHold
 
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(@NonNull ViewHolder_ProductPreviewRclView holder, int position) {
-        ProductPreviewItem item = newProductItemArrayList.get(position);
-        holder.productName.setText(item.getName());
+        ProductPreview item = newProductItemArrayList.get(position);
+        holder.productName.setText(Utils.truncateText(item.getName()));
         holder.sellingPrice.setText(Utils.formatPrice(item.getSellingPrice()));
         if (newProductItemArrayList.get(position).getDiscount() > 0) {
             holder.originalPrice.setText(Utils.formatPrice(item.getOriginal_price()));
@@ -52,27 +57,40 @@ public class Adapter_ProductPreviewRclView extends RecyclerView.Adapter<ViewHold
             holder.discount.setText("-" + item.getDiscount().toString() + "%");
         } else {
             holder.discount.setVisibility(View.INVISIBLE);
-            holder.originalPrice.setHeight(0);
-
-            holder.originalPrice.setVisibility(View.INVISIBLE);
+            holder.originalPrice.setVisibility(View.GONE);
         }
-        holder.rootLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Integer productId = item.getProduct_id();
-                Intent it = new Intent(v.getContext(), ProductDetailActivity.class);
-                it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                it.putExtra("productId", productId);
-                v.getContext().startActivity(it);
-            }
+        holder.rootLayout.setOnClickListener(v -> {
+            Integer productId = item.getProduct_id();
+            Intent it = new Intent(v.getContext(), ProductDetailActivity.class);
+            it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            it.putExtra("productId", productId);
+            v.getContext().startActivity(it);
         });
-        new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + item.getLogo(), holder.logo, R.drawable.img_image_broke).execute();
+        Bitmap logoBitmap = item.getBitmapLogo();
+        if (logoBitmap == null) {
+            holder.logo.setImageBitmap(null);
+            Executor executor = Executors.newSingleThreadExecutor();
+            Handler handler = new Handler(Looper.getMainLooper());
+            executor.execute(() -> {
+                Bitmap bitmap = Utils.getBitmapFromURL(item.getLogo());
+                handler.post(() -> {
+                    if (bitmap != null) {
+                        holder.logo.setImageBitmap(bitmap);
+                        item.setBitmapLogo(bitmap);
+                    } else {
+                        holder.logo.setImageResource(R.drawable.img_image_broke);
+                    }
+                });
+            });
+        } else {
+            holder.logo.setImageBitmap(logoBitmap);
+        }
         holder.ratingBar.setRating(item.getRating());
     }
 
     @Override
     public int getItemCount() {
-        return Math.min(newProductItemArrayList.size(), 6);
+        return newProductItemArrayList.size();
     }
 }
 

@@ -11,6 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:paddingBottom="20dp"
         android:id="@+id/ProductDetail_RootLayout">
 
         <androidx.constraintlayout.widget.ConstraintLayout
@@ -190,6 +191,13 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView6" />
 
+            <TextView
+                android:id="@+id/ProductDetail_ErrorText"
+                android:visibility="gone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Có lỗi xảy ra khi tải sản phẩm" />
+
             <LinearLayout
                 android:id="@+id/linearLayout4"
                 android:layout_width="match_parent"
@@ -312,13 +320,71 @@
         </LinearLayout>
 
         <TextView
-            android:id="@+id/ProductDetail_ErrorText"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:padding="4dp"
-            android:text="Có lỗi xảy ra ..."
-            android:textAlignment="center"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             android:textSize="22sp"
-            android:visibility="gone" />
+            android:fontFamily="sans-serif-black"
+            android:padding="10dp"
+            android:text="Thông tin sản phẩm :" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp">
+
+            <WebView
+                android:id="@+id/ProductDetail_Spec_WebView"
+                android:layout_width="match_parent"
+                android:layout_height="3000dp"
+                android:background="@color/white" />
+
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="22sp"
+            android:fontFamily="sans-serif-black"
+            android:padding="10dp"
+            android:text="Mô tả sản phẩm :" />
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="300dp">
+
+            <WebView
+                android:id="@+id/ProductDetail_Description_WebView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@color/white" />
+        </FrameLayout>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Đánh giá :"
+            android:textSize="22sp"
+            android:fontFamily="sans-serif-black"
+            android:padding="10dp" />
+
+        <ImageView
+            android:id="@+id/ProductDetail_NoCommentImg"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_gravity="center"
+            android:src="@drawable/img_nonstar" />
+
+        <TextView
+            android:id="@+id/ProductDetail_NoComment_TxtView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="3dp"
+            android:textSize="16sp"
+            android:layout_gravity="center_horizontal"
+            android:text="Chưa có đánh giá nào" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/ProductDetail_Comment_RclView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
     </LinearLayout>
 </ScrollView>

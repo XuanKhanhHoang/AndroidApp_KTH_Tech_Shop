@@ -2,24 +2,32 @@ package com.ktm.kthtechshop.api;
 
 import com.ktm.kthtechshop.dto.AddCartSendToServer;
 import com.ktm.kthtechshop.dto.AddOptionToCartResponse;
+import com.ktm.kthtechshop.dto.CartItem;
 import com.ktm.kthtechshop.dto.CategoryItem;
 import com.ktm.kthtechshop.dto.DeleteCartItem;
-import com.ktm.kthtechshop.dto.GetCartResponse;
+import com.ktm.kthtechshop.dto.GetHaveTotalPageResponse;
 import com.ktm.kthtechshop.dto.LoginResponse;
 import com.ktm.kthtechshop.dto.Login_UserInfo;
+import com.ktm.kthtechshop.dto.Order;
 import com.ktm.kthtechshop.dto.ProductDetail;
 import com.ktm.kthtechshop.dto.ProductListResponse;
 import com.ktm.kthtechshop.dto.PromotionBannerItem;
+import com.ktm.kthtechshop.dto.UserFullDetail;
+import com.ktm.kthtechshop.dto.updateUserDetailResponse;
 
 import java.util.ArrayList;
 import java.util.Map;
 
+import okhttp3.RequestBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.GET;
 import retrofit2.http.HTTP;
 import retrofit2.http.Header;
+import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.PUT;
+import retrofit2.http.PartMap;
 import retrofit2.http.Query;
 import retrofit2.http.QueryMap;
 
@@ -43,7 +51,7 @@ public interface ApiServices {
     Call<LoginResponse> loginWithAccessToken(@Header("Authorization") String accessToken);
 
     @GET("cart/getcart")
-    Call<GetCartResponse> getCart(@Header("Authorization") String accessToken);
+    Call<GetHaveTotalPageResponse<ArrayList<CartItem>>> getCart(@Header("Authorization") String accessToken);
 
     @POST("cart/addproduct")
     Call<AddOptionToCartResponse> addOptionToCart(@Header("Authorization") String accessToken, @Body() AddCartSendToServer optionId);
@@ -51,5 +59,19 @@ public interface ApiServices {
     @HTTP(method = "DELETE", path = "cart/deleteproduct", hasBody = true)
     Call<DeleteCartItem> deleteOptionInCart(@Header("Authorization") String accessToken, @Body() DeleteCartItem deleteCartId);
 
+    @GET("order/orderlist")
+    Call<GetHaveTotalPageResponse<ArrayList<Order>>> getOrderList(@Header("Authorization") String accessToken, @Query("status_id") int statusId, @Query("page") int page);
+
+    @GET("order/orderlist")
+    Call<GetHaveTotalPageResponse<ArrayList<Order>>> getOrderList(@Header("Authorization") String accessToken, @Query("page") int page);
+
+    @GET("customer/customer_detail")
+    Call<UserFullDetail> getCustomerDetail(@Header("Authorization") String accessToken);
+
+    @Multipart
+    @PUT("customer/update_detail")
+    Call<updateUserDetailResponse> editUser(@Header("Authorization") String authorization,
+                                            @PartMap Map<String, RequestBody> params
+    );
 }
 

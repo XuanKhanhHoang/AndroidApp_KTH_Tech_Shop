@@ -22,7 +22,7 @@ import com.ktm.kthtechshop.R;
 import com.ktm.kthtechshop.adapter.Adapter_CartRclView;
 import com.ktm.kthtechshop.dto.CartItem;
 import com.ktm.kthtechshop.dto.CartItemSaved;
-import com.ktm.kthtechshop.dto.GetCartResponse;
+import com.ktm.kthtechshop.dto.GetHaveTotalPageResponse;
 import com.ktm.kthtechshop.dto.LoginResponse;
 import com.ktm.kthtechshop.others.Cart_CartItem_Checked_Listener;
 import com.ktm.kthtechshop.utils.Utils;
@@ -142,9 +142,9 @@ public class CartActivity extends NeededCallApiActivity implements Cart_CartItem
     }
 
     private void getCart(String accessToken) {
-        apiServices.getCart(accessToken).enqueue(new Callback<GetCartResponse>() {
+        apiServices.getCart(accessToken).enqueue(new Callback<GetHaveTotalPageResponse<ArrayList<CartItem>>>() {
             @Override
-            public void onResponse(@NonNull Call<GetCartResponse> call, @NonNull Response<GetCartResponse> response) {
+            public void onResponse(@NonNull Call<GetHaveTotalPageResponse<ArrayList<CartItem>>> call, @NonNull Response<GetHaveTotalPageResponse<ArrayList<CartItem>>> response) {
                 if (response.isSuccessful()) {
                     assert response.body() != null;
                     ArrayList<CartItem> res = response.body().value;
@@ -187,7 +187,7 @@ public class CartActivity extends NeededCallApiActivity implements Cart_CartItem
 
 
             @Override
-            public void onFailure(@NonNull Call<GetCartResponse> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<GetHaveTotalPageResponse<ArrayList<CartItem>>> call, @NonNull Throwable t) {
                 Toast.makeText(CartActivity.this, "fetch cart failed", Toast.LENGTH_SHORT).show();
             }
         });

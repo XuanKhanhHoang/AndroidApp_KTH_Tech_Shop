@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:padding="5dp">
+
+    <TextView
+        android:id="@+id/OrderPreviewItemLayout_Name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-medium"
+        android:text="Samsung Galaxy S24 Ultra Blue 256GB,Iphone 12 Red 256GB, ..." />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="Giá: "
+            android:layout_marginRight="20dp" />
+
+        <TextView
+            android:id="@+id/OrderPreviewItemLayout_Price"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="#F44336"
+            android:text="200000đ" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="Trạng thái đơn hàng: "
+            android:layout_marginRight="20dp" />
+
+        <TextView
+            android:id="@+id/OrderPreviewItemLayout_Status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Đang giao" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:text="Thời gian đặt: "
+            android:layout_marginRight="20dp" />
+
+        <TextView
+            android:id="@+id/OrderPreviewItemLayout_Time"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="29/01/2024 22:09:33" />
+    </LinearLayout>
+</LinearLayout>

@@ -66,7 +66,7 @@ public class Adapter_CartRclView extends RecyclerView.Adapter<Adapter_CartRclVie
         holder.productName.setText(item.option.products.name);
         holder.optionName.setText(item.option.name);
         holder.image.setImageResource(R.drawable.s23_xang);
-//        new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + item.option.image, holder.image).execute();
+//        new ImageLoadFromURL( item.option.image, holder.image).execute();
         holder.amountEdiTxt.setText(String.valueOf(item.amount));
         holder.originalPrice.setText(Utils.formatPrice(item.option.originalPrice));
         holder.sellingPrice.setText(Utils.formatPrice(item.option.sellingPrice));

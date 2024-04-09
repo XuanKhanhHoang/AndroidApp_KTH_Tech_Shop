@@ -1,5 +1,6 @@
 package com.ktm.kthtechshop.activity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -52,7 +53,7 @@ import com.ktm.kthtechshop.dto.LoginResponse;
 import com.ktm.kthtechshop.dto.ProductListResponse;
 import com.ktm.kthtechshop.dto.ProductPreviewItem;
 import com.ktm.kthtechshop.dto.PromotionBannerItem;
-import com.ktm.kthtechshop.localhostIp;
+import com.ktm.kthtechshop.model.ProductPreview;
 import com.ktm.kthtechshop.others.CategoryViewModel;
 import com.ktm.kthtechshop.staticData.PromotionBannerType;
 import com.ktm.kthtechshop.utils.ImageLoadFromURL;
@@ -70,32 +71,33 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class HomePageFragment extends Fragment {
-    private ApiServiceObject apiServiceObject;
     static ArrayList<PromotionBannerItem> promotionStaticBannerList;
     static ArrayList<SlideModel> promotionBannerSlideItems;
     static CategoryViewModel categoryViewModel;
-    private RecyclerView categoryRclView, promotionStaticBannerRclView, flashSaleRclView, allProductRclView, smartphoneProductRclView, laptopProductRclView;
+    private ArrayList<ProductPreview> allProductArrayList, smartphoneProductList, tabletProductList;
+    static ArrayList<ProductPreviewItem> flashSaleProductList;
+    private ApiServiceObject apiServiceObject;
+    private RecyclerView categoryRclView, promotionStaticBannerRclView, flashSaleRclView, allProductRclView, smartphoneProductRclView, tabletProductRclView;
 
-    static ArrayList<ProductPreviewItem> flashSaleProductList, allProductArrayList, smartphoneProductList, laptopProductList;
     private ImageSlider promotionBannerSlider;
     private AppSharedPreferences appSharedPreferences;
     private ImageView userImgView;
-    private Button smartPhoneBtnMore, laptopBtnMore, latestProductBtnMore;
+    private Button smartPhoneBtnMore, tabletBtnMore, latestProductBtnMore;
     private boolean isCheckingAccount = true;
     private ImageButton cartBtn;
-    public final Integer smartphoneCategoryId = 1, laptopCategoryId = 2;
+    public final Integer smartphoneCategoryId = 1, tabletCategoryId = 2;
     private ArrayList<CategoryItem> categoryList;
     private ArrayList<CategoryItemViewModel> categoryItemArrayList;
     private ShimmerFrameLayout shimmerFrameLayoutCategory1, shimmerFrameLayoutCategory2, shimmerFrameLayoutCategory3, shimmerFrameLayoutCategory4;
     private LinearLayout shimmerFrameLayoutCategoryContainer;
     protected EditText searchEditText;
 
-    private Call<ProductListResponse> callLatestProduct, callLaptopProduct, callSmartPhoneProduct;
+    private Call<ProductListResponse> callLatestProduct, callTabletProduct, callSmartPhoneProduct;
     private Call<ArrayList<PromotionBannerItem>> callPromotionBanner;
     private Call<ArrayList<CategoryItem>> callCategory;
     private Call<LoginResponse> callCheckingValidUserSession;
 
-    private boolean smartphoneProductIsSet, latestProductIsSet, laptopProductIsSet;
+    private boolean smartphoneProductIsSet, latestProductIsSet, tabletProductIsSet;
     private Context context;
     private Activity activity;
     private View view;
@@ -118,15 +120,14 @@ public class HomePageFragment extends Fragment {
         if (!appSharedPreferences.getAccessToken().isEmpty()) checkValidUserSession();
         else {
             userImgView.setImageResource(R.drawable.icon_user);
-            userImgView.setBackgroundColor(Color.TRANSPARENT);
         }
-        if (!laptopProductIsSet) {
-            handleLaptopProduct();
+        if (!tabletProductIsSet) {
+            handleTabletProduct();
         }
         if (!smartphoneProductIsSet) {
             handleSmartPhoneProduct();
         }
-        if (!laptopProductIsSet) {
+        if (!latestProductIsSet) {
             handleLatestProduct();
         }
 
@@ -135,6 +136,7 @@ public class HomePageFragment extends Fragment {
     private HomePageFragment() {
     }
 
+    @SuppressLint("StaticFieldLeak")
     static HomePageFragment homePageFragment;
 
     public static HomePageFragment getInstance() {
@@ -161,7 +163,7 @@ public class HomePageFragment extends Fragment {
         apiServiceObject = new ApiServiceObject();
         latestProductIsSet = false;
         smartphoneProductIsSet = false;
-        laptopProductIsSet = false;
+        tabletProductIsSet = false;
         //ref child view component
         refChildComponents();
         //setup rclViews
@@ -199,7 +201,7 @@ public class HomePageFragment extends Fragment {
         //Get Product
         handleLatestProduct();
         handleSmartPhoneProduct();
-        handleLaptopProduct();
+        handleTabletProduct();
         //setup button click listener
         setUpButtonsOnClickListen();
         setUpSearchFunction();
@@ -224,14 +226,13 @@ public class HomePageFragment extends Fragment {
                         for (int i = 0; i < categoryList.size(); i++) {
                             int finalI1 = i;
                             executor.execute(() -> {
-                                // Công việc nền, ví dụ: tải bitmap từ URL
                                 CategoryItem ct = categoryList.get(finalI1);
-                                Bitmap bitmap = Utils.getBitmapFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + ct.getIcon());
+                                Bitmap bitmap = Utils.getBitmapFromURL(ct.getIcon());
                                 handler.post(() -> {
                                     categoryItemArrayList.add(new CategoryItemViewModel(ct.getName(), ct.getIcon(), ct.getId(), bitmap));
                                     if (finalI1 == (categoryList.size() - 1)) {
                                         categoryViewModel.setCategories(categoryItemArrayList);
-                                        //it will run to  callback function which was  set in behind
+                                        //it will jump to  callback function which was  set in behind
                                     }
                                 });
 
@@ -255,11 +256,11 @@ public class HomePageFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        if (callCategory == null || callPromotionBanner == null || callLatestProduct == null || callLaptopProduct == null || callSmartPhoneProduct == null)
+        if (callCategory == null || callPromotionBanner == null || callLatestProduct == null || callTabletProduct == null || callSmartPhoneProduct == null)
             return;
         callCategory.cancel();
         callPromotionBanner.cancel();
-        callLaptopProduct.cancel();
+        callTabletProduct.cancel();
         callLatestProduct.cancel();
         callSmartPhoneProduct.cancel();
         if (callCheckingValidUserSession == null) return;
@@ -273,11 +274,11 @@ public class HomePageFragment extends Fragment {
         promotionStaticBannerRclView = view.findViewById(R.id.promotionStaticBanner);
         allProductRclView = view.findViewById(R.id.allProductlist_rclview);
         smartphoneProductRclView = view.findViewById(R.id.smartphone_rclview);
-        laptopProductRclView = view.findViewById(R.id.laptop_rclview);
+        tabletProductRclView = view.findViewById(R.id.Tablet_rclview);
         flashSaleRclView = view.findViewById(R.id.flashsale_rclview);
         userImgView = view.findViewById(R.id.HomePage_UserIcon_imgView);
         smartPhoneBtnMore = view.findViewById(R.id.HomPage_Btn_smartphoneHeader_more);
-        laptopBtnMore = view.findViewById(R.id.HomPage_Btn_LaptopHeader_more);
+        tabletBtnMore = view.findViewById(R.id.HomPage_Btn_TabletHeader_more);
         latestProductBtnMore = view.findViewById(R.id.HomPage_Btn_newProductHeader_more);
 
         shimmerFrameLayoutCategory1 = view.findViewById(R.id.HomePage_ShimmerCategory1);
@@ -322,8 +323,8 @@ public class HomePageFragment extends Fragment {
         flashSaleRclView.setHasFixedSize(true);
         smartphoneProductRclView.setLayoutManager(new GridLayoutManager(context, 2));
         smartphoneProductRclView.setHasFixedSize(true);
-        laptopProductRclView.setLayoutManager(new GridLayoutManager(context, 2));
-        laptopProductRclView.setHasFixedSize(true);
+        tabletProductRclView.setLayoutManager(new GridLayoutManager(context, 2));
+        tabletProductRclView.setHasFixedSize(true);
     }
 
     private void getPromotionBanner() {
@@ -344,9 +345,9 @@ public class HomePageFragment extends Fragment {
                         promotionBannerSlideItems = new ArrayList<>();
                         promotionStaticBannerList = new ArrayList<>();
 
-                        if (tmp != null && tmp.size() > 0) {
+                        if (tmp != null && !tmp.isEmpty()) {
                             for (PromotionBannerItem item : tmp) {
-                                item.setImage(localhostIp.LOCALHOST_IP.getValue() + ":3000" + item.getImage());
+                                item.setImage(item.getImage());
                                 if (item.getType() == PromotionBannerType.CAROUSEL.getValue()) {
                                     promotionBannerSlideItems.add(new SlideModel(item.getImage(), ScaleTypes.CENTER_INSIDE));
                                 } else {
@@ -355,7 +356,7 @@ public class HomePageFragment extends Fragment {
                             }
 
                         }
-                        if (promotionStaticBannerList.size() != 0)
+                        if (!promotionStaticBannerList.isEmpty())
                             promotionStaticBannerRclView.setVisibility(View.VISIBLE);
                         promotionStaticBannerRclView.setAdapter(new Adapter_PromotionBannerStaticRclView(context, promotionStaticBannerList));
                         promotionBannerSlider.setImageList(promotionBannerSlideItems);
@@ -377,7 +378,7 @@ public class HomePageFragment extends Fragment {
             });
 
         } else {
-            if (promotionStaticBannerList.size() == 0)
+            if (promotionStaticBannerList.isEmpty())
                 promotionStaticBannerRclView.setVisibility(View.GONE);
             promotionStaticBannerRclView.setAdapter(new Adapter_PromotionBannerStaticRclView(context, promotionStaticBannerList));
             promotionBannerSlider.setImageList(promotionBannerSlideItems);
@@ -390,10 +391,20 @@ public class HomePageFragment extends Fragment {
             flashSaleProductList = new ArrayList<>();
             float rating = 3.4f;
             Integer productId = 1;
-            flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 ", 20000000, 20000000, productId, rating));
-            flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 ", 20000000, 20000000, productId, rating));
-            flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 abc  ", 3000000, 200000, 20, productId, rating));
-            flashSaleProductList.add(new ProductPreviewItem(" ", "samsung S23 Ultra 2023 abc", 3000000, 200000, 20, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "1 ", 20000000, 20000000, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "2", 20000000, 20000000, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "3", 3000000, 200000, 20, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "4", 3000000, 200000, 20, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "5", 3000000, 200000, 20, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "6", 3000000, 200000, 20, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "7", 3000000, 200000, 20, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "8", 3000000, 200000, 20, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "9", 3000000, 200000, 20, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "10", 3000000, 200000, 20, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "11", 3000000, 200000, 20, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "12", 3000000, 200000, 20, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "13", 3000000, 200000, 20, productId, rating));
+            flashSaleProductList.add(new ProductPreviewItem(" ", "14", 3000000, 200000, 20, productId, rating));
         }
         flashSaleRclView.setAdapter(new Adapter_FlashSalePreviewRclView(context, flashSaleProductList));
 
@@ -409,6 +420,7 @@ public class HomePageFragment extends Fragment {
         if (allProductArrayList == null) {
             Map<String, String> mp = new HashMap<String, String>();
             mp.put("product_per_page", "6");
+            mp.put("page", "1");
             callLatestProduct = apiServiceObject.apiServices.getProductList(mp);
             callLatestProduct.enqueue(new Callback<ProductListResponse>() {
                 @Override
@@ -421,7 +433,11 @@ public class HomePageFragment extends Fragment {
                         if (pr != null && pr.totalPage > 0)
                             view.findViewById(R.id.allProductNoProduct_textView).setVisibility(View.INVISIBLE);
                         assert pr != null;
-                        allProductArrayList = pr.data;
+                        allProductArrayList = new ArrayList<>();
+                        for (ProductPreviewItem item :
+                                pr.data) {
+                            allProductArrayList.add(new ProductPreview(item));
+                        }
                         latestProductIsSet = true;
                         allProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, allProductArrayList));
                     } else {
@@ -438,7 +454,7 @@ public class HomePageFragment extends Fragment {
                 }
             });
         } else {
-            if (allProductArrayList.size() > 0)
+            if (!allProductArrayList.isEmpty())
                 view.findViewById(R.id.allProductNoProduct_textView).setVisibility(View.INVISIBLE);
             allProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, allProductArrayList));
         }
@@ -456,6 +472,7 @@ public class HomePageFragment extends Fragment {
         if (smartphoneProductList == null) {
             Map<String, String> mp1 = new HashMap<String, String>();
             mp1.put("category_id", "1");
+            mp1.put("page", "1");
             callSmartPhoneProduct = apiServiceObject.apiServices.getProductList(mp1);
             callSmartPhoneProduct.enqueue(new Callback<ProductListResponse>() {
                 @Override
@@ -464,12 +481,16 @@ public class HomePageFragment extends Fragment {
                         if (call.isCanceled()) {
                             return;
                         }
-                        ProductListResponse pr = (ProductListResponse) (response.body());
+                        ProductListResponse pr = response.body();
                         if (pr != null && pr.totalPage > 0)
                             view.findViewById(R.id.smartphoneListNoProduct_textView).setVisibility(View.INVISIBLE);
                         assert pr != null;
                         smartphoneProductIsSet = true;
-                        smartphoneProductList = pr.data;
+                        smartphoneProductList = new ArrayList<>();
+                        for (ProductPreviewItem item :
+                                pr.data) {
+                            smartphoneProductList.add(new ProductPreview(item));
+                        }
                         smartphoneProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, smartphoneProductList));
                     } else {
                         Toast.makeText(activity, "Something Wrong", Toast.LENGTH_SHORT).show();
@@ -485,39 +506,46 @@ public class HomePageFragment extends Fragment {
                 }
             });
         } else {
-            if (smartphoneProductList.size() > 0)
+            if (!smartphoneProductList.isEmpty())
                 view.findViewById(R.id.smartphoneListNoProduct_textView).setVisibility(View.INVISIBLE);
             smartphoneProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, smartphoneProductList));
         }
     }
 
-    private void handleLaptopProduct() {
-        laptopBtnMore.setOnClickListener((v) -> {
+    private void handleTabletProduct() {
+        tabletBtnMore.setOnClickListener((v) -> {
             Intent it = new Intent(v.getContext(), ProductListActivity.class);
             Map<String, String> mp = new HashMap<String, String>();
-            mp.put("category_id", laptopCategoryId.toString());
+            mp.put("category_id", tabletCategoryId.toString());
+
             it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             it.putExtra("queryParams", (Serializable) mp);
             v.getContext().startActivity(it);
         });
-        if (laptopProductList == null) {
+        if (tabletProductList == null) {
             Map<String, String> mp2 = new HashMap<String, String>();
             mp2.put("category_id", "2");
-            callLaptopProduct = apiServiceObject.apiServices.getProductList(mp2);
-            callLaptopProduct.enqueue(new Callback<ProductListResponse>() {
+            mp2.put("page", "1");
+
+            callTabletProduct = apiServiceObject.apiServices.getProductList(mp2);
+            callTabletProduct.enqueue(new Callback<ProductListResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<ProductListResponse> call, @NonNull Response<ProductListResponse> response) {
                     if (response.isSuccessful()) {
                         if (call.isCanceled()) {
                             return;
                         }
-                        laptopProductIsSet = true;
-                        ProductListResponse pr = (ProductListResponse) (response.body());
+                        tabletProductIsSet = true;
+                        ProductListResponse pr = response.body();
                         if (pr != null && pr.totalPage > 0)
-                            view.findViewById(R.id.laptop_no_product_textView).setVisibility(View.INVISIBLE);
+                            view.findViewById(R.id.Tablet_no_product_textView).setVisibility(View.INVISIBLE);
                         assert pr != null;
-                        laptopProductList = pr.data;
-                        laptopProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, laptopProductList));
+                        tabletProductList = new ArrayList<>();
+                        for (ProductPreviewItem item :
+                                pr.data) {
+                            tabletProductList.add(new ProductPreview(item));
+                        }
+                        tabletProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, tabletProductList));
                     } else {
                         Toast.makeText(activity, "Something Wrong", Toast.LENGTH_SHORT).show();
                     }
@@ -528,13 +556,13 @@ public class HomePageFragment extends Fragment {
                     if (call.isCanceled()) {
                         return;
                     }
-                    Toast.makeText(activity, "Có lỗi xảy ra khi tải danh sách sản phẩm laptop", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(activity, "Có lỗi xảy ra khi tải danh sách sản phẩm tablet", Toast.LENGTH_SHORT).show();
                 }
             });
         } else {
-            if (laptopProductList.size() > 0)
-                view.findViewById(R.id.laptop_no_product_textView).setVisibility(View.INVISIBLE);
-            laptopProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, laptopProductList));
+            if (!tabletProductList.isEmpty())
+                view.findViewById(R.id.Tablet_no_product_textView).setVisibility(View.INVISIBLE);
+            tabletProductRclView.setAdapter(new Adapter_ProductPreviewRclView(context, tabletProductList));
         }
     }
 
@@ -552,7 +580,7 @@ public class HomePageFragment extends Fragment {
                         appSharedPreferences.setAllAttribute(response.body().value.userId,
                                 response.body().accessToken, response.body().value.firstName,
                                 response.body().value.avatar);
-                        new ImageLoadFromURL(localhostIp.LOCALHOST_IP.getValue() + ":3000" + response.body().value.avatar, userImgView, R.drawable.icon_user).execute();
+                        new ImageLoadFromURL(response.body().value.avatar, userImgView, R.drawable.icon_user).execute();
                     } else {
                         Toast.makeText(activity, "Xác thực thất bại, vui lòng đăng nhập lại ", Toast.LENGTH_SHORT).show();
 //                        appSharedPreferences.clear();
@@ -588,7 +616,9 @@ public class HomePageFragment extends Fragment {
                     it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                     v.getContext().startActivity(it);
                 } else {
-                    //to user activity
+                    Intent it = new Intent(v.getContext(), UserActivity.class);
+                    it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    v.getContext().startActivity(it);
                 }
             }
         });

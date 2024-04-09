@@ -16,22 +16,19 @@
         android:paddingTop="40dp"
         android:gravity="center_vertical">
 
-        <androidx.cardview.widget.CardView
-            android:layout_width="55dp"
-            android:layout_height="55dp"
-            app:cardCornerRadius="99dp"
-            android:gravity="center"
-            android:layout_marginStart="20dp">
 
-            <ImageView
-                android:id="@+id/MyAccountFragment_UserLogo"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_gravity="center"
-                android:src="@drawable/ic_user_solid"
-                android:scaleType="centerCrop"
-                android:contentDescription="CustomerLogo" />
-        </androidx.cardview.widget.CardView>
+        <com.google.android.material.imageview.ShapeableImageView
+            android:id="@+id/MyAccountFragment_UserLogo"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginStart="20dp"
+            app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
+            app:strokeColor="@color/main"
+            android:src="@drawable/ic_user_solid"
+            android:layout_gravity="center"
+            android:background="@color/white"
+            app:contentPadding="10dp"
+            app:strokeWidth="0dp" />
 
         <TextView
             android:id="@+id/MyAccountFragment_UserName"

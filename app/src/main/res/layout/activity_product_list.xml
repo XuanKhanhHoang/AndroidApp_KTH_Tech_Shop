@@ -5,7 +5,6 @@
     android:id="@+id/scrollView"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:nestedScrollingEnabled="false"
     android:background="@color/white">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -79,57 +78,53 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/line1">
 
-            <Button
-                android:id="@+id/button2"
-                style="?attr/materialButtonOutlinedStyle"
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/ProductList_LatestProductBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.2"
-                android:backgroundTint="#FFFFFF"
                 android:padding="0dp"
                 android:text="Mới nhất"
                 android:textColor="#000000"
                 android:textSize="14sp"
-                app:cornerRadius="0dp"
-                app:strokeColor="@color/main" />
+                android:background="@drawable/shape_rectangle_solid_bottom_border_main" />
 
-            <Button
-                android:id="@+id/button3"
-                style="null"
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/ProductList_MinimumProductBtn"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
+                android:layout_height="match_parent"
                 android:layout_weight="0.35"
-                android:backgroundTint="#FFFFFF"
+                android:background="#FFFFFF"
                 android:padding="10dp"
                 android:text="Giá thấp nhất"
                 android:textColor="#000000"
                 android:textSize="14sp"
                 app:cornerRadius="0dp" />
 
-            <Button
-                android:id="@+id/button4"
-                style="null"
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/ProductList_FiveStarProductBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="0.1"
-                android:backgroundTint="#FFFFFF"
+                android:background="#FFFFFF"
                 android:drawableEnd="@drawable/ic_star_yellow"
                 android:drawablePadding="0dp"
-                android:padding="0dp"
+                android:paddingHorizontal="10dp"
                 android:text="5 sao"
-                android:textAlignment="textEnd"
+                android:textAlignment="center"
                 android:textColor="#000000"
                 android:textSize="14sp"
                 app:cornerRadius="0dp" />
 
-            <Button
-                android:id="@+id/button5"
-                style="null"
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/ProductList_FilterBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:backgroundTint="#FFFFFF"
+                android:background="#FFFFFF"
                 android:drawableEnd="@drawable/ic_filter_solid"
                 android:text="Lọc"
+                android:drawablePadding="0dp"
+                android:paddingHorizontal="10dp"
                 android:textColor="#000000"
                 android:textSize="14sp"
                 app:cornerRadius="0dp" />
@@ -140,7 +135,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
-            android:nestedScrollingEnabled="false"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/action_menu_bar" />
@@ -167,7 +161,7 @@
             android:layout_marginTop="10dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/action_menu_bar">
+            app:layout_constraintTop_toBottomOf="@+id/productList_rclview">
 
             <com.facebook.shimmer.ShimmerFrameLayout
                 android:id="@+id/ProductList_ProductPreviewShimmer1"

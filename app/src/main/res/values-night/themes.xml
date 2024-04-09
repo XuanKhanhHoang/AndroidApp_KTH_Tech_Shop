@@ -1,11 +1,16 @@
 <resources>
-    
+
     <!-- Base application theme. -->
     <style name="Base.Theme.KTHTechShop" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
         <item name="colorPrimary">@color/white</item>
         <item name="android:statusBarColor">@android:color/transparent</item>
         <item name="android:windowBackground">@color/white</item>
+    </style>
+
+    <style name="roundedImageViewRounded">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
     </style>
 
     <style name="Theme.KTHTechShop" parent="Base.Theme.KTHTechShop" />
@@ -23,4 +28,12 @@
         <item name="android:textColorHint">#000</item>
     </style>
 
+    <style name="MRadioButton.Purple" parent="Widget.AppCompat.CompoundButton.RadioButton">
+        <item name="colorAccent">@color/main</item>
+        <item name="colorControlHighlight">@color/main</item>
+        <item name="android:colorPressedHighlight">@color/main</item>
+        <item name="colorPrimaryDark">@color/main</item>
+        <item name="colorPrimary">@color/main</item>
+        <item name="colorControlActivated">@color/main</item>
+    </style>
 </resources>

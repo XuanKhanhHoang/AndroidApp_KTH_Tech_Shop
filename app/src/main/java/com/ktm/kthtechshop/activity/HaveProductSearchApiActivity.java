@@ -49,6 +49,7 @@ public class HaveProductSearchApiActivity extends NeededCallApiActivity {
                 it.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 it.putExtra("queryParams", (Serializable) mp);
                 v.getContext().startActivity(it);
+                finish();
                 return true;
             }
             return false;

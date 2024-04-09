@@ -14,7 +14,7 @@ public class ProductDetail {
     @SerializedName("product_options")
     public ArrayList<ProductOption> productOptions;
     public ProductDetail_Brand brand;
-    public ArrayList<ProductDetail_Comment> comment;
+    public ArrayList<ProductDetail_ProductComment> comment;
 
     public ProductDetail(int productId, String name, String logo, String description, String information, float rating, ArrayList<ProductOption> productOptions) {
         this.logo = logo;
@@ -26,7 +26,7 @@ public class ProductDetail {
         this.productOptions = productOptions;
     }
 
-    public ProductDetail(int productId, String name, String logo, String description, String information, float rating, ArrayList<ProductOption> productOptions, ProductDetail_Brand brand, ArrayList<ProductDetail_Comment> comment) {
+    public ProductDetail(int productId, String name, String logo, String description, String information, float rating, ArrayList<ProductOption> productOptions, ProductDetail_Brand brand, ArrayList<ProductDetail_ProductComment> comment) {
         this.logo = logo;
         this.name = name;
         this.description = description;
@@ -36,26 +36,6 @@ public class ProductDetail {
         this.productOptions = productOptions;
         this.brand = brand;
         this.comment = comment;
-    }
-}
-
-class ProductDetail_Comment {
-    public int id;
-    public String content;
-    public double rating;
-    public ProductDetail_User user;
-    public String sellerReply;
-    public String createAt;
-    public ProductDetail_Image[] image;
-
-    public ProductDetail_Comment(int id, String content, double rating, ProductDetail_User user, String sellerReply, String createAt, ProductDetail_Image[] image) {
-        this.id = id;
-        this.content = content;
-        this.rating = rating;
-        this.user = user;
-        this.sellerReply = sellerReply;
-        this.createAt = createAt;
-        this.image = image;
     }
 }
 
@@ -69,24 +49,6 @@ class ProductDetail_Brand {
     }
 }
 
-class ProductDetail_User {
-    public int userId;
-    public String avatar;
-    public String firstName;
 
-    public ProductDetail_User(int userId, String avatar, String firstName) {
-        this.userId = userId;
-        this.avatar = avatar;
-        this.firstName = firstName;
-    }
-}
 
-class ProductDetail_Image {
-    public String image;
-
-    public ProductDetail_Image(String image) {
-        this.image = image;
-    }
-
-}
 
