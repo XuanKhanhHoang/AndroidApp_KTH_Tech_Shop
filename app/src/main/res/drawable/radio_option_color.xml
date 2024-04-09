@@ -1,0 +1,7 @@
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_checked="true" android:drawable="@drawable/ic_circle_dot_regular" />
+    <item android:state_selected="true" android:drawable="@drawable/ic_circle_regular"/>
+
+    <item  android:drawable="@drawable/ic_circle_regular" />
+</selector>
+
