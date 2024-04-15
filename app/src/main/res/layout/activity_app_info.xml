@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity_and_fragment.AppInfoActivity"
+    android:orientation="vertical">
+
+    <ImageButton
+        android:id="@+id/backBtn"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="#ffff"
+        android:contentDescription="@string/back_text"
+        android:src="@drawable/ic_arrow_left_solid" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Giới thiệu ứng dụng"
+        android:textAlignment="center"
+        android:textSize="23sp"
+        android:fontFamily="sans-serif-condensed-medium"
+        android:padding="5dp"
+        android:textColor="@color/main" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Tên app : "
+            android:textAlignment="center"
+            android:textSize="17sp"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:padding="5dp"
+            android:textColor="@color/main" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="KTH Tech Shop"
+            android:textAlignment="center"
+            android:textSize="17sp"
+            android:fontFamily="sans-serif-condensed"
+            android:padding="5dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Developers: "
+            android:textAlignment="center"
+            android:textSize="17sp"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:padding="5dp"
+            android:textColor="@color/main" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hoàng Xuân Khanh"
+            android:textAlignment="center"
+            android:textSize="17sp"
+            android:fontFamily="sans-serif-condensed"
+            android:padding="5dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Thời gian phát triển : "
+            android:textAlignment="center"
+            android:textSize="17sp"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:padding="5dp"
+            android:textColor="@color/main" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="02/2024"
+            android:textAlignment="center"
+            android:textSize="17sp"
+            android:fontFamily="sans-serif-condensed"
+            android:padding="5dp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text=" Contact: "
+            android:textAlignment="center"
+            android:textSize="17sp"
+            android:fontFamily="sans-serif-condensed-medium"
+            android:padding="5dp"
+            android:textColor="@color/main" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="HoangXuanKhanh.Work@gmail.com"
+            android:textAlignment="center"
+            android:textSize="17sp"
+            android:fontFamily="sans-serif-condensed"
+            android:padding="5dp" />
+    </LinearLayout>
+
+</LinearLayout>

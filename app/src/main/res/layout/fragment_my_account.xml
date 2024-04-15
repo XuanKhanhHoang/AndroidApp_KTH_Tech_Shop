@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#DFDFDF"
-    tools:context=".activity.MyAccountFragment"
+    tools:context=".activity_and_fragment.MyAccountFragment"
     android:orientation="vertical">
 
     <LinearLayout
@@ -27,6 +27,7 @@
             android:src="@drawable/ic_user_solid"
             android:layout_gravity="center"
             android:background="@color/white"
+            android:scaleType="fitXY"
             app:contentPadding="10dp"
             app:strokeWidth="0dp" />
 
@@ -42,6 +43,7 @@
     </LinearLayout>
 
     <TextView
+        android:id="@+id/MyAccountFragment_MyOrders"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Đơn hàng của tôi"
@@ -69,9 +71,10 @@
         android:gravity="center_vertical" />
 
     <TextView
+        android:id="@+id/MyAccountFragment_AppInfo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Cài đặt tài khoản"
+        android:text="Thông tin ứng dụng"
         android:background="@color/white"
         android:layout_marginBottom="4dp"
         android:textSize="17sp"
@@ -96,6 +99,7 @@
         android:gravity="center_vertical" />
 
     <TextView
+        android:id="@+id/MyAccountFragment_ChPlay"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Nhận xét"

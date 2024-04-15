@@ -1,0 +1,303 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".activity_and_fragment.CreateOrderActivity">
+
+    <LinearLayout
+        android:id="@+id/ln_top"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/shape_rectangle_bottom_gray_line"
+        android:gravity="center_vertical"
+        android:paddingBottom="2dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageButton
+            android:id="@+id/Global_BackBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="#ffff"
+            android:contentDescription="@string/back_text"
+            android:src="@drawable/ic_arrow_left_solid" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-medium"
+            android:text="Xác nhận đơn đặt hàng"
+            android:textColor="@color/main"
+            android:textSize="20sp" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/ln_top">
+
+        <LinearLayout
+            android:id="@+id/ln"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            android:paddingBottom="160dp"
+            app:layout_constraintTop_toTopOf="parent">
+
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="5dp"
+                android:paddingVertical="10dp"
+                android:text="Thông tin người nhận :"
+                android:textColor="@color/main"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/CreateOrderActivity_RecipientName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:hint="Họ và tên người nhận"
+                android:padding="0dp"
+                app:boxStrokeColor="@color/main"
+                app:boxStrokeWidth="1dp"
+                app:errorTextAppearance="@color/main"
+                app:hintTextColor="@color/light_grey">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/CreateOrderActivity_PhoneNumber"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:hint="Số điện thoại"
+                android:padding="0dp"
+                app:boxStrokeColor="@color/main"
+                app:boxStrokeWidth="1dp"
+                app:errorTextAppearance="@color/main"
+                app:hintTextColor="@color/light_grey">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:enabled="false" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/CreateOrderActivity_Address"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:hint="Địa chỉ"
+                android:padding="0dp"
+                app:boxStrokeColor="@color/main"
+                app:boxStrokeWidth="1dp"
+                app:errorTextAppearance="@color/main"
+                app:hintTextColor="@color/light_grey">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="5dp"
+                android:paddingHorizontal="5dp"
+                android:paddingVertical="10dp"
+                android:text="Danh sách sản phẩm :"
+                android:textColor="@color/main"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/CreateOrderActivity_Products_rclView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="true"
+                android:paddingHorizontal="5dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="5dp"
+                android:paddingVertical="10dp"
+                android:text="Phương thức thanh toán :"
+                android:textColor="@color/main"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <Spinner
+                android:id="@+id/CreateOrderActivity_PaymentMethodSpinner"
+                android:layout_width="match_parent"
+                android:layout_height="30dp" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="5dp"
+                android:paddingVertical="3dp"
+                android:text="Phương thức thanh toán qua thẻ hiện thời đang bảo trì ,vui lòng chọn thanh toán khi nhận hàng."
+                android:textColor="@color/c9c9c9"
+                android:textSize="12sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="5dp"
+                android:paddingVertical="10dp"
+                android:text="Tổng tiền hàng : "
+                android:textColor="@color/main"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed-medium"
+                    android:text="Tổng tiền hàng :"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/CreateOrderActivity_TotalCost"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:paddingEnd="100dp"
+                    android:text="28.000.000đ"
+                    android:textColor="#F44336"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="sans-serif-condensed-medium"
+                    android:text="Phí vận chuyển :"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:paddingEnd="100dp"
+                    android:text="20.000đ"
+                    android:textColor="#F44336"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="5dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="40dp"
+                    android:fontFamily="sans-serif-condensed-medium"
+                    android:text="Tổng thanh toán :"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/CreateOrderActivity_TotalCost2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="end"
+                    android:paddingEnd="100dp"
+                    android:text="20.020.000đ"
+                    android:textColor="#F44336"
+                    android:textSize="14sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+
+    </ScrollView>
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:cardUseCompatPadding="true"
+        app:cardElevation="3dp"
+        android:padding="4dp"
+        app:cardCornerRadius="2dp">
+
+        <LinearLayout
+            android:id="@+id/lnb"
+            android:layout_width="match_parent"
+            android:layout_height="60dp"
+            android:orientation="horizontal"
+            android:padding="3dp"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_marginStart="40dp"
+                android:text="Tổng thanh toán: "
+                android:gravity="center_vertical" />
+
+            <TextView
+                android:id="@+id/CreateOrderActivity_TotalCost1"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:text="12.389.999đ"
+                android:textColor="#FF5722"
+                android:layout_weight="1"
+                android:gravity="center" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/CreateOrderActivity_Payment_Btn"
+                android:layout_width="120dp"
+                android:layout_height="match_parent"
+                android:text="Mua Hàng"
+                android:background="@drawable/shape_rectangle_rounded_r5dp"
+                android:backgroundTint="@color/main"
+                android:layout_margin="0dp"
+                android:textSize="11sp"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

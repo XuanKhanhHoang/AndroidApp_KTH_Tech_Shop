@@ -36,4 +36,13 @@
         <item name="colorControlActivated">@color/main</item>
     </style>
 
+    <style name="Theme.KTHTechShop.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.KTHTechShop.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
+
+    <style name="Theme.KTHTechShop.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
 </resources>

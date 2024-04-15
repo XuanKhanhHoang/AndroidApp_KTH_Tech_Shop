@@ -1,9 +1,9 @@
 package com.ktm.kthtechshop;
 
 public enum localhostIp {
-    LOCALHOST_IP("http://192.168.42.18");
+    LOCALHOST_IP("http://192.168.42.87");
 //    LOCALHOST_IP("http://10.0.2.2");//avd
-//    LOCALHOST_IP("http://172.16.1.2");//ld
+//    LOCALHOST_IP("http://192.168.2.13");//ld
 
     private final String value;
 

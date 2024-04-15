@@ -28,8 +28,7 @@
             android:id="@+id/CartItemLayout_Image"
             android:layout_width="100dp"
             android:layout_height="100dp"
-            android:scaleType="fitCenter"
-            android:src="@drawable/s23_xang" />
+            android:scaleType="fitCenter" />
 
         <LinearLayout
             android:layout_width="match_parent"

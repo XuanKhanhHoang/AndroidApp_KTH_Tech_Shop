@@ -1,14 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.NotifyFragment">
+    tools:context=".activity_and_fragment.NotifyFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-</FrameLayout>
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Thông báo"
+            android:textColor="@color/white"
+            android:fontFamily="sans-serif-medium"
+            android:textSize="25sp"
+            android:paddingVertical="8dp"
+            android:background="@color/main"
+            android:paddingHorizontal="10dp"
+
+            />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/NotifyFragment_notifyListRclView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingHorizontal="10dp"
+            android:layout_marginTop="10dp"
+            android:background="@color/white" />
+
+
+        <TextView
+            android:id="@+id/NotifyFragment_notifyTextStatus"
+            android:padding="8dp"
+            android:textAlignment="center"
+            android:background="@drawable/shape_rectangle_outline"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="18sp"
+            android:text="Bạn chưa có thông báo nào" />
+
+    </LinearLayout>
+
+
+</ScrollView>

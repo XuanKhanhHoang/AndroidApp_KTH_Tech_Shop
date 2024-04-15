@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:orientation="vertical"
         android:nestedScrollingEnabled="false"
-        tools:context=".activity.UserEditInfoActivity">
+        tools:context=".activity_and_fragment.UserEditInfoActivity">
 
         <ImageButton
             android:id="@+id/Global_BackBtn"
@@ -38,7 +38,7 @@
                 android:layout_gravity="center"
                 android:background="@color/white"
                 app:contentPadding="15dp"
-                android:scaleType="centerCrop"
+                android:scaleType="fitCenter"
                 app:strokeWidth="0dp" />
 
         </LinearLayout>
