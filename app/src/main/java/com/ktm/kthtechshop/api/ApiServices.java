@@ -16,6 +16,7 @@ import com.ktm.kthtechshop.dto.ProductDetail;
 import com.ktm.kthtechshop.dto.ProductListResponse;
 import com.ktm.kthtechshop.dto.ProductOptionWithProductName;
 import com.ktm.kthtechshop.dto.PromotionBannerItem;
+import com.ktm.kthtechshop.dto.SendAccessToken;
 import com.ktm.kthtechshop.dto.UserFullDetail;
 import com.ktm.kthtechshop.dto.updateUserDetailResponse;
 
@@ -88,5 +89,11 @@ public interface ApiServices {
     @POST("order/create_order")
     Call<CreateOrderResponse> createOrder(@Header("Authorization") String accessToken, @Body() CreateOrderSendToServer bd);
 
+    @Multipart
+    @POST("customer/create_new_customer")
+    Call<LoginResponse> createCustomer(@PartMap Map<String, RequestBody> params);
+
+    @POST("auth/login_by_facebook")
+    Call<LoginResponse> loginWithFacebook(@Body() SendAccessToken access_token);
 }
 

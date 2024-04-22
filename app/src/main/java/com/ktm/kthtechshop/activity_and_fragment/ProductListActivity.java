@@ -8,7 +8,6 @@ import android.os.Handler;
 import android.text.InputFilter;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -24,6 +23,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.textfield.TextInputLayout;
 import com.ktm.kthtechshop.R;
 import com.ktm.kthtechshop.adapters.Adapter_ProductPreviewRclView;
+import com.ktm.kthtechshop.adapters.Adapter_Spinner_FilterBrandItem;
+import com.ktm.kthtechshop.adapters.Adapter_Spinner_FilterCategoryItem;
 import com.ktm.kthtechshop.dto.Brand;
 import com.ktm.kthtechshop.dto.CategoryItem;
 import com.ktm.kthtechshop.dto.ProductListResponse;
@@ -44,7 +45,8 @@ public class ProductListActivity extends HaveProductSearchApiActivity {
 
     private ArrayList<ProductPreview> productList;
 
-    ArrayList<String> catList, brLsit;
+    private ArrayList<CategoryItem> catList;
+    private ArrayList<Brand> brList;
     private RecyclerView productListRclView;
     private Integer page = 1, totalPage = 0;
     private TextView loadingTxtView;
@@ -187,13 +189,18 @@ public class ProductListActivity extends HaveProductSearchApiActivity {
         }
 
         apiServices.getProductList(params).enqueue(new Callback<ProductListResponse>() {
+            @SuppressLint("NotifyDataSetChanged")
             @Override
             public void onResponse(@NonNull Call<ProductListResponse> call, @NonNull Response<ProductListResponse> response) {
                 if (response.isSuccessful()) {
                     ProductListResponse pr = response.body();
-                    if (pr != null && page == 1 && pr.totalPage == 0)
+                    if (pr != null && page == 1 && pr.totalPage == 0) {
                         findViewById(R.id.no_product_textView).setVisibility(View.VISIBLE);
-                    if (pr != null) {
+                        productList.clear();
+                        totalPage = 0;
+                        productsAdapter.notifyDataSetChanged();
+                    } else if (pr != null) {
+                        findViewById(R.id.no_product_textView).setVisibility(View.GONE);
                         if (isOverrideData) productList.clear();
                         for (ProductPreviewItem item :
                                 pr.data) {
@@ -204,7 +211,6 @@ public class ProductListActivity extends HaveProductSearchApiActivity {
                     if (!isWaiting) findViewById(R.id.loadingText).setVisibility(View.GONE);
                     productList_ProductPreviewShimmerContainer1.setVisibility(View.GONE);
                     productList_ProductPreviewShimmerContainer2.setVisibility(View.GONE);
-//                    productListRclView.setAdapter(new Adapter_ProductPreviewRclView(ProductListActivity.this, productList));
                     productsAdapter.notifyDataSetChanged();
                 } else {
                     Toast.makeText(ProductListActivity.this, "Something Wrong", Toast.LENGTH_SHORT).show();
@@ -240,67 +246,51 @@ public class ProductListActivity extends HaveProductSearchApiActivity {
 //        String categoryJson = appSharedPreferences.getCategory();
         Spinner cSp = findViewById(R.id.FilterProductLayout_CategorySpinner);
         catList = new ArrayList<>();
-        catList.add("Không chọn");
+        catList.add(new CategoryItem("Không chọn", "", "-1"));
         final int[] id = {0};
         apiServices.getCategoryList().enqueue(new Callback<ArrayList<CategoryItem>>() {
             @Override
             public void onResponse(Call<ArrayList<CategoryItem>> call, Response<ArrayList<CategoryItem>> response) {
                 if (response.isSuccessful()) {
-                    for (int i = 0; i < response.body().size(); i++) {
-                        catList.add(response.body().get(i).getName());
-                        if (coreQueryParams.get("category_id") != null && response.body().get(i).getId().equals(coreQueryParams.get("category_id"))) {
-                            id[0] = i;
+                    catList.addAll(response.body());
+                    if (coreQueryParams.get("category_id") != null)
+                        for (int i = 0; i < response.body().size(); i++) {
+                            if (response.body().get(i).getId().equals(coreQueryParams.get("category_id"))) {
+                                id[0] = i;
+                                break;
+                            }
                         }
-                    }
 
-                    ArrayAdapter ad
-                            = new ArrayAdapter(
-                            ProductListActivity.this,
-                            android.R.layout.simple_spinner_item,
-                            catList);
-                    ad.setDropDownViewResource(
-                            android.R.layout
-                                    .simple_spinner_dropdown_item);
+                    Adapter_Spinner_FilterCategoryItem ad = new Adapter_Spinner_FilterCategoryItem(ProductListActivity.this, android.R.layout.simple_spinner_item, catList);
                     cSp.setAdapter(ad);
                     cSp.setSelection(id[0]);
-
                 }
             }
 
             @Override
-            public void onFailure(Call<ArrayList<CategoryItem>> call, Throwable t) {
+            public void onFailure(@NonNull Call<ArrayList<CategoryItem>> call, @NonNull Throwable t) {
 
             }
         });
 
         Spinner bSp = findViewById(R.id.FilterProductLayout_BrandSpinner);
         brandItems = new ArrayList<>();
-        brLsit = new ArrayList<>();
-        brLsit.add("Không chọn");
+        brList = new ArrayList<>();
+        brList.add(new Brand(-1, "Không chọn"));
         apiServices.getBrandList().enqueue(new Callback<ArrayList<Brand>>() {
             @Override
-            public void onResponse(Call<ArrayList<Brand>> call, Response<ArrayList<Brand>> response) {
+            public void onResponse(@NonNull Call<ArrayList<Brand>> call, @NonNull Response<ArrayList<Brand>> response) {
                 if (response.isSuccessful()) {
-                    for (Brand br :
-                            response.body()) {
-                        brLsit.add(br.name);
-
-                    }
-                    ArrayAdapter ad
-                            = new ArrayAdapter(
-                            ProductListActivity.this,
-                            android.R.layout.simple_spinner_item,
-                            brLsit);
-                    ad.setDropDownViewResource(
-                            android.R.layout
-                                    .simple_spinner_dropdown_item);
+                    assert response.body() != null;
+                    brList.addAll(response.body());
+                    Adapter_Spinner_FilterBrandItem ad = new Adapter_Spinner_FilterBrandItem(ProductListActivity.this, android.R.layout.simple_spinner_item, brList);
                     bSp.setAdapter(ad);
                 }
 
             }
 
             @Override
-            public void onFailure(Call<ArrayList<Brand>> call, Throwable t) {
+            public void onFailure(@NonNull Call<ArrayList<Brand>> call, @NonNull Throwable t) {
 
             }
         });
@@ -317,6 +307,8 @@ public class ProductListActivity extends HaveProductSearchApiActivity {
         findViewById(R.id.FilterProductLayout_Filter).setOnClickListener(v -> {
             String minPrice = minP.getEditText().getText().toString();
             String maxPrice = maxP.getEditText().getText().toString();
+            int brandId = ((Brand) bSp.getSelectedItem()).id;
+            String categoryId = ((CategoryItem) cSp.getSelectedItem()).getId();
             page = 1;
 
 
@@ -324,6 +316,8 @@ public class ProductListActivity extends HaveProductSearchApiActivity {
             curQueryParams = new HashMap<>(coreQueryParams);
             if (!maxPrice.isEmpty()) curQueryParams.put("max_price", maxPrice);
             if (!minPrice.isEmpty()) curQueryParams.put("min_price", minPrice);
+            if (brandId != -1) curQueryParams.put("brand_id", String.valueOf(brandId));
+            if (!categoryId.equals("-1")) curQueryParams.put("category_id", categoryId);
             GetDataFromApi(page, curQueryParams, true, true);
         });
     }

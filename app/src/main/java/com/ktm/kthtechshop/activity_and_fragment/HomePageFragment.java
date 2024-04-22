@@ -357,7 +357,7 @@ public class HomePageFragment extends Fragment {
                             for (PromotionBannerItem item : tmp) {
                                 item.setImage(item.getImage());
                                 if (item.getType() == PromotionBannerType.CAROUSEL.getValue()) {
-                                    promotionBannerSlideItems.add(new SlideModel(item.getImage(), ScaleTypes.CENTER_INSIDE));
+                                    promotionBannerSlideItems.add(new SlideModel(item.getImage(), ScaleTypes.FIT));
                                 } else {
                                     promotionStaticBannerList.add(item);
                                 }

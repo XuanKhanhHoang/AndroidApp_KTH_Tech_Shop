@@ -1,6 +1,7 @@
 package com.ktm.kthtechshop.activity_and_fragment;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
@@ -62,6 +63,7 @@ public class UserEditInfoActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -94,7 +96,7 @@ public class UserEditInfoActivity extends AppCompatActivity {
                     executor.execute(() -> {
                         Bitmap bitmap = Utils.getBitmapFromURL(bd.avatar);
                         handler.post(() -> {
-                            if (bitmap != null) {
+                            if (bitmap != null && currentAvatarURI == null) {
                                 avatar.setImageBitmap(bitmap);
                             }
                         });
@@ -114,7 +116,7 @@ public class UserEditInfoActivity extends AppCompatActivity {
             if (!validateInput(userNameTxtILayout, lastNameTxtILayout, firstNameTxtILayout, emailTxtILayout, addressTxtILayout, phoneNumberTxtILayout)) {
                 return;
             }
-
+            confirmBtn.setText("Loading");
             RequestBody requestFile = null;
             File file = null;
             if (currentAvatarURI != null) {
@@ -141,9 +143,8 @@ public class UserEditInfoActivity extends AppCompatActivity {
             new ApiServiceObject().apiServices.editUser(accessToken, data).enqueue(new Callback<updateUserDetailResponse>() {
                 @Override
                 public void onResponse(@NonNull Call<updateUserDetailResponse> call, @NonNull Response<updateUserDetailResponse> response) {
+                    confirmBtn.setText("Chỉnh sửa");
                     if (response.isSuccessful()) {
-
-
                         Intent intent = new Intent(UserEditInfoActivity.this, UserActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
                         startActivity(intent);
@@ -159,6 +160,7 @@ public class UserEditInfoActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(@NonNull Call<updateUserDetailResponse> call, @NonNull Throwable t) {
+                    confirmBtn.setText("Chỉnh sửa");
                     Toast.makeText(UserEditInfoActivity.this, "Thay đổi thông tin thất bại", Toast.LENGTH_SHORT).show();
                     isLoading = false;
                 }

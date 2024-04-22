@@ -18,6 +18,11 @@
     <string name="nav_header_desc">Navigation header</string>
     <string name="action_settings">Settings</string>
 
+    <string name="facebook_app_id">1474210003495771</string>
+    <string name="fb_login_protocol_scheme">fb1474210003495771</string>
+    <string name="facebook_client_token">325bf689c0a3f3b6cc98cf29f41a13f9</string>
+
+
     <string name="menu_home">Home</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>

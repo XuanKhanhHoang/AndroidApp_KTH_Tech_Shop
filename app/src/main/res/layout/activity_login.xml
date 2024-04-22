@@ -79,19 +79,41 @@
 
         <androidx.appcompat.widget.AppCompatButton
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="55dp"
             android:layout_gravity="right"
             android:text="Đăng nhập"
-            android:backgroundTint="#0066FF"
+            android:backgroundTint="@color/main"
             android:padding="18dp"
             android:textSize="15sp"
             android:textColor="@color/white"
             android:shadowColor="#0066FF"
             android:id="@+id/Login_Btn_Login" />
 
-        <androidx.appcompat.widget.AppCompatButton
+        <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:text="Hoặc"
+            android:textAlignment="center"
+            android:padding="2dp"
+            android:textSize="16sp"
+            android:fontFamily="sans-serif-condensed-medium" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
+            android:layout_gravity="right"
+            android:text="Đăng nhập bằng Facebook"
+            android:backgroundTint="#0066FF"
+            android:padding="10dp"
+            android:layout_marginBottom="20dp"
+            android:textSize="15sp"
+            android:drawableStart="@drawable/ic_facebook_svgrepo_32dp"
+            android:textColor="@color/white"
+            android:id="@+id/LoginActivity_LoginByFacebook" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:layout_width="match_parent"
+            android:layout_height="55dp"
             android:layout_gravity="right"
             android:text="Chưa có tài khoản , đăng kí"
             android:backgroundTint="@color/white"

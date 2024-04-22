@@ -13,10 +13,13 @@
         android:orientation="vertical"
         android:padding="20dp">
 
-        <ImageView
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:src="@drawable/logo_big" />
+        <ImageButton
+            android:id="@+id/Global_BackBtn"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="#ffff"
+            android:contentDescription="@string/back_text"
+            android:src="@drawable/ic_arrow_left_solid" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -28,6 +31,29 @@
             android:textStyle="bold" />
 
         <LinearLayout
+            android:layout_marginTop="5dp"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:background="@color/main"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="5dp">
+
+            <com.google.android.material.imageview.ShapeableImageView
+                android:id="@+id/RegisterActivity_UserAvatar"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                app:shapeAppearanceOverlay="@style/roundedImageViewRounded"
+                android:src="@drawable/ic_user_solid"
+                android:layout_gravity="center"
+                android:background="@color/white"
+                app:contentPadding="15dp"
+                android:scaleType="fitCenter"
+                app:strokeWidth="0dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
@@ -37,6 +63,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Email"
+                android:id="@+id/RegisterActivity_Email"
                 android:layout_marginVertical="2dp"
                 app:hintTextColor="#000"
                 app:boxStrokeColor="#000"
@@ -54,6 +81,8 @@
                 android:layout_marginVertical="2dp"
                 app:hintTextColor="#000"
                 app:boxStrokeColor="#000"
+                android:id="@+id/RegisterActivity_PhoneNumber"
+
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -65,6 +94,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Tên đăng nhập "
+                android:id="@+id/RegisterActivity_UserName"
+
                 app:hintTextColor="#000"
                 android:layout_marginVertical="2dp"
                 app:boxStrokeColor="#000"
@@ -82,6 +113,7 @@
                 android:layout_marginVertical="2dp"
                 app:hintTextColor="#000"
                 app:boxStrokeColor="#000"
+                android:id="@+id/RegisterActivity_Password"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 app:passwordToggleEnabled="true">
 
@@ -97,8 +129,107 @@
                 android:hint="Nhập lại mật khẩu"
                 app:hintTextColor="#000"
                 app:boxStrokeColor="#000"
+                android:id="@+id/RegisterActivity_RePassword"
                 style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
                 app:passwordToggleEnabled="true">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Họ của bạn"
+                android:id="@+id/RegisterActivity_LastName"
+
+                app:hintTextColor="#000"
+                android:layout_marginVertical="2dp"
+                app:boxStrokeColor="#000"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Tên của bạn"
+                android:id="@+id/RegisterActivity_FirstName"
+
+                app:hintTextColor="#000"
+                android:layout_marginVertical="2dp"
+                app:boxStrokeColor="#000"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:gravity="center_vertical"
+                android:paddingHorizontal="15dp"
+                android:paddingVertical="8dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Giới Tính : "
+                    android:textSize="17sp"
+                    android:fontFamily="sans-serif-medium" />
+
+                <RadioGroup
+                    android:layout_width="0dp"
+                    android:layout_weight="1"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:id="@+id/RegisterActivity_GenderRadioGr"
+                    android:gravity="center_horizontal">
+
+                    <RadioButton
+                        android:theme="@null"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/Gender_Male"
+                        android:id="@+id/RegisterActivity_GenderMale"
+                        android:paddingHorizontal="15dp"
+                        android:checked="true"
+                        android:buttonTintMode="multiply"
+                        android:buttonTint="@color/main"
+                        android:button="@drawable/radio_option_color" />
+
+                    <RadioButton
+                        android:background="@null"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30dp"
+                        android:text="@string/Gender_Female"
+                        android:layout_marginStart="40dp"
+                        android:paddingHorizontal="15dp"
+                        android:buttonTintMode="multiply"
+                        android:buttonTint="@color/main"
+                        android:button="@drawable/radio_option_color"
+                        android:id="@+id/RegisterActivity_GenderFemale" />
+
+                </RadioGroup>
+            </LinearLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Địa chỉ"
+                android:id="@+id/RegisterActivity_Address"
+
+                app:hintTextColor="#000"
+                android:layout_marginVertical="2dp"
+                app:boxStrokeColor="#000"
+                style="@style/Widget.Material3.TextInputLayout.OutlinedBox">
 
                 <com.google.android.material.textfield.TextInputEditText
                     android:layout_width="match_parent"
